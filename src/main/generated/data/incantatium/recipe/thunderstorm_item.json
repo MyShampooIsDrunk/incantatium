@@ -1,0 +1,40 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:breeze_rod"
+    },
+    "C": {
+      "item": "minecraft:end_crystal"
+    },
+    "E": {
+      "item": "minecraft:echo_shard"
+    },
+    "N": {
+      "item": "minecraft:nautilus_shell"
+    },
+    "T": {
+      "item": "minecraft:totem_of_undying"
+    }
+  },
+  "pattern": [
+    "BNE",
+    "CTC",
+    "ENB"
+  ],
+  "result": {
+    "components": {
+      "minecraft:custom_data": {
+        "custom_item": "incantatium:thunderstorm_item"
+      },
+      "minecraft:custom_model_data": 1,
+      "minecraft:enchantment_glint_override": true,
+      "minecraft:item_name": "\"Aspect of Thunder\"",
+      "minecraft:max_stack_size": 16,
+      "minecraft:rarity": "rare"
+    },
+    "count": 1,
+    "id": "minecraft:clock"
+  }
+}

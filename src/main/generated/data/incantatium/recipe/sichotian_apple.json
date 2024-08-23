@@ -1,0 +1,91 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": {
+      "item": "minecraft:enchanted_golden_apple"
+    },
+    "N": {
+      "item": "minecraft:netherite_block"
+    },
+    "S": {
+      "item": "minecraft:nether_star"
+    },
+    "T": {
+      "item": "minecraft:totem_of_undying"
+    }
+  },
+  "pattern": [
+    "SGS",
+    "TNT",
+    "SGS"
+  ],
+  "result": {
+    "components": {
+      "minecraft:custom_data": {
+        "custom_item": "incantatium:sichotian_apple"
+      },
+      "minecraft:custom_model_data": 1,
+      "minecraft:custom_name": "{\"extra\":[{\"color\":\"#B45F72\",\"text\":\"S\"},{\"color\":\"#AC5570\",\"text\":\"i\"},{\"color\":\"#A44C6D\",\"text\":\"c\"},{\"color\":\"#9B436C\",\"text\":\"h\"},{\"color\":\"#923A6A\",\"text\":\"o\"},{\"color\":\"#883169\",\"text\":\"t\"},{\"color\":\"#7E2967\",\"text\":\"i\"},{\"color\":\"#732266\",\"text\":\"a\"},{\"color\":\"#671B65\",\"text\":\"n\"},\" \",{\"color\":\"#5B1564\",\"text\":\"A\"},{\"color\":\"#4E1063\",\"text\":\"p\"},{\"color\":\"#3F0D61\",\"text\":\"p\"},{\"color\":\"#2F0A5F\",\"text\":\"l\"},{\"color\":\"#1A095D\",\"text\":\"e\"}],\"italic\":false,\"text\":\"\"}",
+      "minecraft:enchantment_glint_override": true,
+      "minecraft:food": {
+        "can_always_eat": true,
+        "eat_seconds": 0.8,
+        "effects": [
+          {
+            "effect": {
+              "duration": 18000,
+              "id": "minecraft:fire_resistance",
+              "show_icon": true
+            }
+          },
+          {
+            "effect": {
+              "amplifier": 5,
+              "duration": 9000,
+              "id": "minecraft:absorption",
+              "show_icon": true
+            }
+          },
+          {
+            "effect": {
+              "amplifier": 1,
+              "duration": 2400,
+              "id": "minecraft:regeneration",
+              "show_icon": true
+            }
+          },
+          {
+            "effect": {
+              "amplifier": 2,
+              "duration": 1800,
+              "id": "minecraft:haste",
+              "show_icon": true
+            }
+          },
+          {
+            "effect": {
+              "amplifier": 4,
+              "duration": 200,
+              "id": "minecraft:regeneration",
+              "show_icon": true
+            }
+          },
+          {
+            "effect": {
+              "amplifier": 4,
+              "duration": 100,
+              "id": "minecraft:resistance",
+              "show_icon": true
+            }
+          }
+        ],
+        "nutrition": 10,
+        "saturation": 40.0
+      },
+      "minecraft:item_name": "{\"translate\":\"incantatium.sichotian_apple.name\"}"
+    },
+    "count": 1,
+    "id": "minecraft:golden_apple"
+  }
+}

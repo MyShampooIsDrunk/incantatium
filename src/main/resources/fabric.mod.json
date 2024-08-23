@@ -7,6 +7,11 @@
 	"authors": [
 		"Me!"
 	],
+	"custom": {
+		"cardinal-components": [
+			"incantatium:riptide_cooldown"
+		]
+	},
 	"contact": {
 		"homepage": "https://fabricmc.net/",
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
@@ -16,10 +21,13 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"myshampooisdrunk.incanatium.Incantatium"
+			"myshampooisdrunk.incantatium.Incantatium"
 		],
 		"fabric-datagen": [
-			"myshampooisdrunk.incanatium.IncantatiumDataGenerator"
+			"myshampooisdrunk.incantatium.IncantatiumDataGenerator"
+		],
+		"cardinal-components": [
+			"myshampooisdrunk.incantatium.component.IncantatiumComponentRegistry"
 		]
 	},
 	"mixins": [
@@ -27,8 +35,8 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.15.11",
-		"minecraft": "~1.20.4",
-		"java": ">=17",
+		"minecraft": "~1.21",
+		"java": ">=21",
 		"fabric-api": "*"
 	},
 	"suggests": {

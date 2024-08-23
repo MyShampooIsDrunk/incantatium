@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:golden_apple"
+    },
+    "D": {
+      "item": "minecraft:diamond_block"
+    },
+    "G": {
+      "item": "minecraft:gold_block"
+    },
+    "S": [
+      {
+        "item": "minecraft:ancient_debris"
+      },
+      {
+        "item": "minecraft:netherite_scrap"
+      }
+    ]
+  },
+  "pattern": [
+    "DGS",
+    "GAG",
+    "SGD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:enchanted_golden_apple"
+  }
+}

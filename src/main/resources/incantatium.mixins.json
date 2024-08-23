@@ -1,16 +1,18 @@
 {
   "required": true,
-  "package": "myshampooisdrunk.incanatium.mixin",
-  "compatibilityLevel": "JAVA_17",
+  "package": "myshampooisdrunk.incantatium.mixin",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "ExampleMixin",
+    "ItemsMixin",
     "MinecraftServerMixin",
     "PendingTickersAccessor",
     "ServerChunkManagerMixin",
     "ServerPlayerEntityMixin",
     "ServerPlayerInteractionManagerMixin",
     "ServerPlayNetworkHandlerMixin",
-    "ServerWorldMixin"
+    "ServerWorldMixin",
+    "StatusEffectsMixin",
+    "TridentItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1
