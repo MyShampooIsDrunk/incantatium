@@ -19,7 +19,6 @@ import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
@@ -30,7 +29,7 @@ import java.util.Map;
 
 public class ThunderstormItem extends CustomRecipeItem<CraftingRecipeInput> {
     public ThunderstormItem() {
-        super(Items.CLOCK, Incantatium.id("thunderstorm_item"), null ,true);
+        super(Items.GHAST_TEAR, Incantatium.id("thunderstorm_item"), null ,true);
         addComponent(DataComponentTypes.ITEM_NAME, Text.literal("Aspect of Thunder"));
         addComponent(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
         addComponent(DataComponentTypes.MAX_STACK_SIZE, 16);

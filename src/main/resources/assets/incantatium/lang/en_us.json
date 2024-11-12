@@ -1,5 +1,8 @@
 {
     "incantatium.time_sword.name":"",
     "incantatium.time_sword.lore":"",
-    "incantatium.time_stop_sword.cooldown_message":"There are %s second(s) left until you may use this item again"
+    "incantatium.time_stop_sword.cooldown_message":"There are %s second(s) left until you may use this item again",
+    "incantatium.broken_armor": "Potion of Broken Armor",
+    "incantatium.splash_broken_armor": "Splash Potion of Broken Armor",
+    "incantatium.lingering_broken_armor": "Lingering Potion of Broken Armor"
 }

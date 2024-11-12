@@ -1,6 +1,6 @@
 package myshampooisdrunk.incantatium;
 
-import myshampooisdrunk.drunk_server_toolkit.WeaponAPI;
+import myshampooisdrunk.drunk_server_toolkit.DST;
 import myshampooisdrunk.incantatium.component.PlayerRiptideCooldown;
 import myshampooisdrunk.incantatium.registry.IncantatiumRegistry;
 import net.fabricmc.api.ModInitializer;
@@ -26,7 +26,7 @@ public class Incantatium implements ModInitializer {
 	public static final FoodComponent MOD_GOD_APPLE = new FoodComponent.Builder()
 			.nutrition(8)
 			.saturationModifier(2F)
-			.statusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 200, 2), 1.0F)
+			.statusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 100, 2), 1.0F)
 			.statusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 6000, 0), 1.0F)
 			.statusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 4800, 2), 1.0F)
 			.alwaysEdible()
@@ -39,21 +39,10 @@ public class Incantatium implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-//		CustomItemRegistry.addToGroup(timeStopItem, ItemGroups.REDSTONE);
-//		CustomItemRegistry.registerRecipe(
-//				new ShapelessRecipe(
-//						"", CraftingRecipeCategory.MISC,
-//						timeStopItem.create(),
-//						DefaultedList.copyOf(Ingredient.ofItems(Items.BEDROCK))
-//				),
-//				timeStopItem.getIdentifier(),
-//				timeStopItem
-//		);
-//		WeaponAPI.initializeRecipes();
 		IncantatiumRegistry.init();
-		WeaponAPI.initializeCommands();
+		DST.initializeCommands();
 	}
 	public static Identifier id(String path){
-		return Identifier.of(LOGGER.getName(), path);
+		return Identifier.of("incantatium", path);
 	}
 }

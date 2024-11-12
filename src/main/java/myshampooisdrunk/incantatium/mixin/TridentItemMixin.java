@@ -71,19 +71,19 @@ public class TridentItemMixin {
                 cooldown.setCooldown(0);
             }
             if(cooldown.useRiptide()){
-                System.out.println("velocity pre mod: " + p.getVelocity());
-                System.out.println("set user velocity");
+//                System.out.println("velocity pre mod: " + p.getVelocity());
+//                System.out.println("set user velocity");
                 p.addVelocity(j, k, l);
-                System.out.println("velocity after: " + p.getVelocity());
+//                System.out.println("velocity after: " + p.getVelocity());
                 p.useRiptide(20, 8.0F * f * 2f/3f, stack);
                 if (p.isOnGround()) {
                     p.move(MovementType.SELF, new Vec3d(0.0, 1.1999999F, 0.0));
                 }
-                RegistryEntry<SoundEvent> registryEntry = (RegistryEntry<SoundEvent>)EnchantmentHelper.getEffect(stack, EnchantmentEffectComponentTypes.TRIDENT_SOUND)
+                RegistryEntry<SoundEvent> registryEntry = EnchantmentHelper.getEffect(stack, EnchantmentEffectComponentTypes.TRIDENT_SOUND)
                         .orElse(SoundEvents.ITEM_TRIDENT_THROW);
                 world.playSoundFromEntity(null, p, registryEntry.value(), SoundCategory.PLAYERS, 1.0F, 1.0F);
                 if(!user.isTouchingWaterOrRain() && f <= 3 && user.canTakeDamage()){
-                    System.out.println("trying to damage user");
+//                    System.out.println("trying to damage user");
                     user.damage(
                             new DamageSource(user.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(Incantatium.TRIDENT_BYPASS), user),
                             Math.clamp(10f - 8f * f/3f, 0, 10)
@@ -93,9 +93,6 @@ public class TridentItemMixin {
             } else{
                 System.out.println("player couldn't use riptide");
             }
-//            else{
-//                ci.cancel();//if you cant use riptide stop running the rest of the function which does all the shit for whether or not you can use riptide
-//            }
         }
         ci.cancel();
         // 3 -> 3; 2.25 -> 2; 1.5 -> 1 | riptide = .75 * (ench_level + 1) | lvl = riptide/.75 - 1
@@ -103,6 +100,7 @@ public class TridentItemMixin {
 
     @ModifyArg(method = "onStoppedUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;useRiptide(IFLnet/minecraft/item/ItemStack;)V"))
     private float modifyDamage(float riptideAttackDamage, @Local(argsOnly = true) ItemStack stack, @Local PlayerEntity playerEntity){
+        playerEntity.velocityModified = true;
         float f = EnchantmentHelper.getTridentSpinAttackStrength(stack, playerEntity);
         return riptideAttackDamage * f * 2f/3f;//riptide 1 -> 8 dmg | r2 -> 12 dmg | r3 -> 16 dmg
     }
