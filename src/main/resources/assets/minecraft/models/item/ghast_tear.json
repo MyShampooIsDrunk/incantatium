@@ -4,11 +4,6 @@
         "layer0": "item/ghast_tear"
     },
     "overrides": [
-        {
-            "predicate": {
-                "custom_model_data": 1
-            },
-            "model": "incantatium:item/aspect_of_thunder"
-        }
+        {"predicate": {"custom_model_data": 1}, "model": "incantatium:item/aspect_of_thunder"}
     ]
 }

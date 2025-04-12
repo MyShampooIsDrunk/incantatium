@@ -9,6 +9,7 @@ import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -75,7 +76,7 @@ public class TridentItemMixin {
 //                System.out.println("set user velocity");
                 p.addVelocity(j, k, l);
 //                System.out.println("velocity after: " + p.getVelocity());
-                p.useRiptide(20, 8.0F * f * 2f/3f, stack);
+                p.useRiptide(20, (float) (6 * f + p.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE) - 1), stack);
                 if (p.isOnGround()) {
                     p.move(MovementType.SELF, new Vec3d(0.0, 1.1999999F, 0.0));
                 }
@@ -102,7 +103,8 @@ public class TridentItemMixin {
     private float modifyDamage(float riptideAttackDamage, @Local(argsOnly = true) ItemStack stack, @Local PlayerEntity playerEntity){
         playerEntity.velocityModified = true;
         float f = EnchantmentHelper.getTridentSpinAttackStrength(stack, playerEntity);
-        return riptideAttackDamage * f * 2f/3f;//riptide 1 -> 8 dmg | r2 -> 12 dmg | r3 -> 16 dmg
+        return (float) (6 * f + playerEntity.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE) - 1);
+        //riptide 1 -> 8 dmg | r2 -> 13.5 dmg | r3 -> 18 dmg
     }
 }
 //3 -> 2; 2 -> 4; 1 -> 6: 6 - 8r/3

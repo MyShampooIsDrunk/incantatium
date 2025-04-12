@@ -1,6 +1,8 @@
 {
     "incantatium.time_sword.name":"",
     "incantatium.time_sword.lore":"",
+    "incantatium.divine_crown.name": "",
+    "incantatium.divine_crown.lore": "",
     "incantatium.time_stop_sword.cooldown_message":"There are %s second(s) left until you may use this item again",
     "incantatium.broken_armor": "Potion of Broken Armor",
     "incantatium.splash_broken_armor": "Splash Potion of Broken Armor",

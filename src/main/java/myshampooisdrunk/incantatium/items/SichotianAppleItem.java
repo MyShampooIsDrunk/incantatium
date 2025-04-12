@@ -1,14 +1,11 @@
 package myshampooisdrunk.incantatium.items;
 
-import myshampooisdrunk.drunk_server_toolkit.item.AbstractCustomItem;
 import myshampooisdrunk.drunk_server_toolkit.item.CustomRecipeItem;
 import myshampooisdrunk.incantatium.Incantatium;
-import net.minecraft.client.recipebook.RecipeBookGroup;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
@@ -23,7 +20,7 @@ import java.util.Map;
 
 import static myshampooisdrunk.incantatium.items.TimeStopItem.rgbToInt;
 
-public class SichotianApple extends CustomRecipeItem<CraftingRecipeInput> {
+public class SichotianAppleItem extends CustomRecipeItem<CraftingRecipeInput> {
 
     public static final FoodComponent SICHOTIAN_APPLE = new FoodComponent.Builder().nutrition(10).saturationModifier(2f).alwaysEdible()
             .statusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 18000, 0), 1.0F)//15 min
@@ -34,7 +31,7 @@ public class SichotianApple extends CustomRecipeItem<CraftingRecipeInput> {
             .statusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 100, 4), 1.0F)//5 sec
             .snack()
             .build();
-    public SichotianApple() {
+    public SichotianAppleItem() {
         super(Items.GOLDEN_APPLE, Identifier.of(Incantatium.LOGGER.getName(),"sichotian_apple"), "incantatium.sichotian_apple.name", true);
 
 

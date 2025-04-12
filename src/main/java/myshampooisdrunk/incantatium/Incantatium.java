@@ -1,10 +1,12 @@
 package myshampooisdrunk.incantatium;
 
 import myshampooisdrunk.drunk_server_toolkit.DST;
-import myshampooisdrunk.incantatium.component.PlayerRiptideCooldown;
+import myshampooisdrunk.incantatium.component.*;
 import myshampooisdrunk.incantatium.registry.IncantatiumRegistry;
+import myshampooisdrunk.incantatium.util.SoulboundHelper;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -18,9 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Incantatium implements ModInitializer {
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
+
+	public static final boolean DEV_MODE = true;
+
     public static final Logger LOGGER = LoggerFactory.getLogger("incantatium");
 
 	public static final FoodComponent MOD_GOD_APPLE = new FoodComponent.Builder()
@@ -33,12 +35,18 @@ public class Incantatium implements ModInitializer {
 			.build();
 	public static final RegistryKey<DamageType> TRIDENT_BYPASS = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, id("trident_bypass"));
 
-
 	public static final ComponentKey<PlayerRiptideCooldown> RIPTIDE_COOLDOWN_COMPONENT_KEY = ComponentRegistry.getOrCreate(
 			id("riptide_cooldown"), PlayerRiptideCooldown.class);
+	public static final ComponentKey<PlayerOrnamentAbilities> ORNAMENT_ABILITIES_COMPONENT_KEY = ComponentRegistry.getOrCreate(
+			id("ornament_abilities"), PlayerOrnamentAbilities.class);
+	public static final ComponentKey<PlayerToggle> TOGGLE_COMPONENT_KEY = ComponentRegistry.getOrCreate(
+			id("toggle_state"), PlayerToggle.class);
+	public static final ComponentKey<PlayerEnduranceEffect> ENDURANCE_COMPONENT_KEY = ComponentRegistry.getOrCreate(
+			id("endurance_effect"), PlayerEnduranceEffect.class);
 
 	@Override
 	public void onInitialize() {
+		ServerPlayerEvents.COPY_FROM.register(SoulboundHelper::copySoulBoundItems);
 		IncantatiumRegistry.init();
 		DST.initializeCommands();
 	}

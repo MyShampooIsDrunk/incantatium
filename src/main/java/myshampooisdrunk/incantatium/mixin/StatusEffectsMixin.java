@@ -8,9 +8,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.*;
 
 @Mixin(StatusEffects.class)
 public class StatusEffectsMixin {
@@ -21,5 +19,10 @@ public class StatusEffectsMixin {
     ))
     private static StatusEffect modifyAttribute(StatusEffect instance, RegistryEntry<EntityAttribute> attribute, Identifier id, double amount, EntityAttributeModifier.Operation operation){
         return instance.addAttributeModifier(EntityAttributes.GENERIC_ARMOR, id, -2.5, operation);
+    }
+
+    @ModifyConstant(method = "<clinit>", constant = @Constant(doubleValue = 3.0f))
+    private static double modifyStrength(double constant){
+        return 2;
     }
 }

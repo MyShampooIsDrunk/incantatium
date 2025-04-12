@@ -4,9 +4,14 @@ import myshampooisdrunk.drunk_server_toolkit.item.AbstractCustomItem;
 import myshampooisdrunk.drunk_server_toolkit.item.potion.CustomPotion;
 import myshampooisdrunk.drunk_server_toolkit.register.CustomItemRegistry;
 import myshampooisdrunk.incantatium.Incantatium;
-import myshampooisdrunk.incantatium.items.SichotianApple;
+import myshampooisdrunk.incantatium.items.DivineCrownItem;
+import myshampooisdrunk.incantatium.items.SichotianAppleItem;
 import myshampooisdrunk.incantatium.items.ThunderstormItem;
 import myshampooisdrunk.incantatium.items.TimeStopItem;
+import myshampooisdrunk.incantatium.items.ornaments.AbstractOrnamentItem;
+import myshampooisdrunk.incantatium.items.ornaments.EnduranceOrnamentItem;
+import myshampooisdrunk.incantatium.items.ornaments.RevelationOrnamentItem;
+import myshampooisdrunk.incantatium.items.ornaments.SalvationOrnamentItem;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -20,17 +25,21 @@ import java.util.Map;
 
 public class IncantatiumRegistry {
 
+    public static final AbstractCustomItem DIVINE_CROWN = CustomItemRegistry.registerItem(new DivineCrownItem());
     public static final AbstractCustomItem TIME_STOP_SWORD = CustomItemRegistry.registerItem(new TimeStopItem());
     public static final AbstractCustomItem THUNDERSTORM_ITEM = CustomItemRegistry.registerWithRecipe(new ThunderstormItem());
-    public static final AbstractCustomItem SICHOTIAN_APPLE = CustomItemRegistry.registerWithRecipe(new SichotianApple());
+    public static final AbstractCustomItem SICHOTIAN_APPLE = CustomItemRegistry.registerWithRecipe(new SichotianAppleItem());
+    public static final AbstractCustomItem REVELATION_ORNAMENT = CustomItemRegistry.registerItem(new RevelationOrnamentItem());
+    public static final AbstractCustomItem ENDURANCE_ORNAMENT = CustomItemRegistry.registerItem(new EnduranceOrnamentItem());
+    public static final AbstractCustomItem SALVATION_ORNAMENT = CustomItemRegistry.registerItem(new SalvationOrnamentItem());
 
     public static final CustomPotion BROKEN_ARMOR = CustomPotion.builder()
             .addEffect(
                     (dur, pot, type) -> (900 + (pot == 0 ? 900 * dur : -468))/(type == CustomPotion.PotionType.LINGER ? 4:1),
                     StatusEffects.UNLUCK)
             .color(6050900)
-            .maxDurationLevel(1)
-            .maxPotency(1)
+            .maxDurationLevel(1,Ingredient.ofItems(Items.REDSTONE))
+            .maxPotency(1,Ingredient.ofItems(Items.GLOWSTONE_DUST))
             .build(Incantatium.id("broken_armor"));
 
     public static void init(){

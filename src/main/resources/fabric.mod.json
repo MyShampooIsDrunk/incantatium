@@ -9,7 +9,10 @@
 	],
 	"custom": {
 		"cardinal-components": [
-			"incantatium:riptide_cooldown"
+			"incantatium:riptide_cooldown",
+			"incantatium:ornament_abilities",
+			"incantatium:toggle_state",
+			"incantatium:endurance_effect"
 		]
 	},
 	"contact": {
