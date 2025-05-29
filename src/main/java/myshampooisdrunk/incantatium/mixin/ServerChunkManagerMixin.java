@@ -13,14 +13,14 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ServerChunkManager.class)
 public abstract class ServerChunkManagerMixin extends ChunkManager {
 	@Redirect(
-			method = "tickChunks",
+			method = "tickChunks(Lnet/minecraft/util/profiler/Profiler;JLjava/util/List;)V",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;tickChunk(Lnet/minecraft/world/chunk/WorldChunk;I)V")
 	)
 	private void shouldActuallyTickChunks(ServerWorld instance, WorldChunk chunk, int j) {
 		if(TickHelper.shouldTick(instance.getServer(),chunk)) instance.tickChunk(chunk, j);
 	}
 	@Redirect(
-			method="tickChunks",
+			method="tickChunks(Lnet/minecraft/util/profiler/Profiler;JLjava/util/List;)V",
 			at=@At(value="INVOKE",target = "Lnet/minecraft/world/chunk/WorldChunk;increaseInhabitedTime(J)V")
 	)
 	private void shouldActuallyTickChunks2(WorldChunk chunk, long l){

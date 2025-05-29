@@ -6,18 +6,22 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.*;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageType;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
-import net.minecraft.item.Equipment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.DamageTypeTags;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
@@ -25,6 +29,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
@@ -32,25 +37,28 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static myshampooisdrunk.incantatium.items.TimeStopItem.rgbToInt;
 
 public class DivineCrownItem extends AbstractCustomArmorItem{
     public DivineCrownItem() {
-        super(Items.FERMENTED_SPIDER_EYE, Incantatium.id("divine_crown"), "incantatium.divine_crown.name", true, ArmorItem.Type.HELMET);
+        super(Items.FERMENTED_SPIDER_EYE, Incantatium.id("divine_crown"), "incantatium.divine_crown.name",
+                Incantatium.getModel(Incantatium.id("divine_crown")),
+                EquippableComponent.builder(EquipmentSlot.HEAD).equipSound(SoundEvents.ITEM_ARMOR_EQUIP_GOLD).build());
         addComponent(DataComponentTypes.ATTRIBUTE_MODIFIERS,
                 AttributeModifiersComponent.builder()
-                        .add(EntityAttributes.GENERIC_ARMOR,
+                        .add(EntityAttributes.ARMOR,
                                 new EntityAttributeModifier(
                                         Incantatium.id("crown_armor"),
                                         5, EntityAttributeModifier.Operation.ADD_VALUE),
                                 AttributeModifierSlot.HEAD
-                        ).add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS,
+                        ).add(EntityAttributes.ARMOR_TOUGHNESS,
                                 new EntityAttributeModifier(
                                         Incantatium.id("crown_armor_toughness"),
                                         4, EntityAttributeModifier.Operation.ADD_VALUE),
                                 AttributeModifierSlot.HEAD
-                        ).add(EntityAttributes.GENERIC_MAX_HEALTH,
+                        ).add(EntityAttributes.MAX_HEALTH,
                                 new EntityAttributeModifier(
                                         Incantatium.id("crown_max_health"),
                                         20, EntityAttributeModifier.Operation.ADD_VALUE),
@@ -104,22 +112,17 @@ public class DivineCrownItem extends AbstractCustomArmorItem{
         addComponent(DataComponentTypes.LORE, new LoreComponent(lore));
         addComponent(DataComponentTypes.MAX_STACK_SIZE, 1);
         addComponent(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
-        addComponent(DataComponentTypes.FIRE_RESISTANT, Unit.INSTANCE);
+        addComponent(DataComponentTypes.DAMAGE_RESISTANT, new DamageResistantComponent(DamageTypeTags.NO_KNOCKBACK));
         addComponent(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
     }
 
     @Override
-    public RegistryEntry<SoundEvent> getEquipSound() {//feel free to override this
-        return SoundEvents.ITEM_ARMOR_EQUIP_GOLD;
-    }
-
-    @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected, CallbackInfo ci) {
-        if(entity instanceof PlayerEntity p){
+        if(entity instanceof PlayerEntity p && world instanceof ServerWorld sWorld){
             if(slot==3 && p.getInventory().getArmorStack(3)==stack){
                 List<StatusEffectInstance> effects = new ArrayList<>();
-                int demos = world.getPlayers(TargetPredicate.createAttackable()
-                        .setPredicate(l -> p.distanceTo(l) <= 50), p, Box.of(p.getPos(), 50,50,50)).size();
+                int demos = sWorld.getPlayers(TargetPredicate.createAttackable()
+                        .setPredicate((l,w) -> p.distanceTo(l) <= 50), p, Box.of(p.getPos(), 50,50,50)).size();
                 effects.add(new StatusEffectInstance(StatusEffects.GLOWING, 10));
                 if(demos >= 1){
                     effects.add(new StatusEffectInstance(StatusEffects.REGENERATION, 10));

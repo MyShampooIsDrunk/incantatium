@@ -1,6 +1,7 @@
 package myshampooisdrunk.incantatium.component;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
@@ -89,11 +90,11 @@ public class PlayerRiptideCooldown implements RiptideCooldown{
     }
 
     @Override
-    public boolean useRiptide(){//returns false if the player cant use riptide
+    public boolean useRiptide(ItemStack tridentStack){//returns false if the player cant use riptide
         if(charges <= 0) return false;
         if(cooldown == 0) return true;
         if(cooldown > 0) charges--;
-        if(charges == 0) player.getItemCooldownManager().set(Items.TRIDENT, cooldown);
+        if(charges == 0) player.getItemCooldownManager().set(tridentStack, cooldown);
         lastUse = 0;
         return true;
     }

@@ -2,22 +2,12 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "minecraft:golden_apple"
-    },
-    "D": {
-      "item": "minecraft:diamond_block"
-    },
-    "G": {
-      "item": "minecraft:gold_block"
-    },
+    "A": "minecraft:golden_apple",
+    "D": "minecraft:diamond_block",
+    "G": "minecraft:gold_block",
     "S": [
-      {
-        "item": "minecraft:ancient_debris"
-      },
-      {
-        "item": "minecraft:netherite_scrap"
-      }
+      "minecraft:ancient_debris",
+      "minecraft:netherite_scrap"
     ]
   },
   "pattern": [

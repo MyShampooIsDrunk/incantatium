@@ -8,17 +8,30 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 
 @Mixin(StatusEffects.class)
-public class StatusEffectsMixin {
+public abstract class StatusEffectsMixin {
+
+    @Shadow
+    private static RegistryEntry<StatusEffect> register(String id, StatusEffect statusEffect) {
+        return null;
+    }
+
     @Redirect(method = "<clinit>", at=@At(
             value = "INVOKE",
             target = "Lnet/minecraft/entity/effect/StatusEffect;addAttributeModifier(Lnet/minecraft/registry/entry/RegistryEntry;Lnet/minecraft/util/Identifier;DLnet/minecraft/entity/attribute/EntityAttributeModifier$Operation;)Lnet/minecraft/entity/effect/StatusEffect;",
             ordinal = 9
     ))
     private static StatusEffect modifyAttribute(StatusEffect instance, RegistryEntry<EntityAttribute> attribute, Identifier id, double amount, EntityAttributeModifier.Operation operation){
-        return instance.addAttributeModifier(EntityAttributes.GENERIC_ARMOR, id, -2.5, operation);
+        return instance.addAttributeModifier(EntityAttributes.ARMOR, id, -2.5, operation);
+    }
+
+    @Redirect(method = "<clinit>", at= @At(value = "INVOKE", target = "Lnet/minecraft/entity/effect/StatusEffects;register(Ljava/lang/String;Lnet/minecraft/entity/effect/StatusEffect;)Lnet/minecraft/registry/entry/RegistryEntry;", ordinal = 28))
+    private static RegistryEntry<StatusEffect> redirectConduitPower(String id, StatusEffect statusEffect) {
+        System.out.println(id);
+        return register(id, statusEffect.addAttributeModifier(EntityAttributes.ATTACK_SPEED, Identifier.ofVanilla("effect.conduit_power"), 0.05F, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
     }
 
     @ModifyConstant(method = "<clinit>", constant = @Constant(doubleValue = 3.0f))

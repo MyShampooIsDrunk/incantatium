@@ -1,5 +1,6 @@
 package myshampooisdrunk.incantatium.component;
 
+import net.minecraft.item.ItemStack;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 
 public interface RiptideCooldown extends ServerTickingComponent {
@@ -9,5 +10,5 @@ public interface RiptideCooldown extends ServerTickingComponent {
     void setCooldown(int ticks);
     int get();
     void set(int charges);
-    boolean useRiptide();
+    boolean useRiptide(ItemStack tridentStack);
 }

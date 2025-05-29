@@ -11,7 +11,6 @@ import net.minecraft.component.type.UnbreakableComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
@@ -19,7 +18,6 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -32,7 +30,7 @@ public class TimeStopItem extends AbstractCustomItem {
     public static final int ABILITY_COOLDOWN_TICKS = 1400;//70 sec (1 min + 10 sec while its being used)
 
     public TimeStopItem() {
-        super(Items.NETHERITE_SWORD, Incantatium.id("time_stop_sword"),"incantatium.time_sword.name", true);
+        super(Items.NETHERITE_SWORD, Incantatium.id("time_stop_sword"),"incantatium.time_sword.name", Incantatium.getModel(Incantatium.id("time_sword")));
         String s = "Forgotten Deity's Greatsword";
         int spaces = 0;
         int[][] nums = new int[][] {
@@ -83,6 +81,7 @@ public class TimeStopItem extends AbstractCustomItem {
             chunkMan.exempt(user);
             chunkMan.freezeFor(200);
             ((CustomItemCooldownManagerI)user).getCustomItemCooldownManager().set("time_stop",ABILITY_COOLDOWN_TICKS);
+            user.getItemCooldownManager().set(user.getStackInHand(hand), ABILITY_COOLDOWN_TICKS);
         }else{
             user.sendMessage(Text.literal(String.format("There are %s second(s) left until you may use this item again",
                             (int)(0.95+((CustomItemCooldownManagerI) user).getCustomItemCooldownManager()

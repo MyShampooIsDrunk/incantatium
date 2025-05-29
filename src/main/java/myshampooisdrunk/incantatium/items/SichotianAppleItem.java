@@ -1,12 +1,17 @@
 package myshampooisdrunk.incantatium.items;
 
-import myshampooisdrunk.drunk_server_toolkit.item.CustomRecipeItem;
+import myshampooisdrunk.drunk_server_toolkit.item.AbstractCustomItem;
+import myshampooisdrunk.drunk_server_toolkit.item.AbstractRecipeItem;
+import myshampooisdrunk.drunk_server_toolkit.item.CustomRecipe;
 import myshampooisdrunk.incantatium.Incantatium;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ConsumableComponent;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Items;
+import net.minecraft.item.consume.ApplyEffectsConsumeEffect;
 import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.recipe.input.CraftingRecipeInput;
@@ -20,19 +25,21 @@ import java.util.Map;
 
 import static myshampooisdrunk.incantatium.items.TimeStopItem.rgbToInt;
 
-public class SichotianAppleItem extends CustomRecipeItem<CraftingRecipeInput> {
+public class SichotianAppleItem extends AbstractCustomItem implements CustomRecipe<CraftingRecipeInput> {
 
-    public static final FoodComponent SICHOTIAN_APPLE = new FoodComponent.Builder().nutrition(10).saturationModifier(2f).alwaysEdible()
-            .statusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 18000, 0), 1.0F)//15 min
-            .statusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 9000, 5), 1.0F)//7.5 min
-            .statusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 2400, 1), 1.0F)//2 min
-            .statusEffect(new StatusEffectInstance(StatusEffects.HASTE, 1800, 2), 1.0F)//1.5 min
-            .statusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 200, 4), 1.0F)//10 sec
-            .statusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 100, 4), 1.0F)//5 sec
-            .snack()
-            .build();
+    public static final FoodComponent SICHOTIAN_APPLE_HUNGER = new FoodComponent.Builder().nutrition(10).saturationModifier(2f).alwaysEdible().build();
+    public static final ConsumableComponent SICHOTIAN_APPLE_EFFECTS = ConsumableComponent.builder().consumeEffect(
+            new ApplyEffectsConsumeEffect(
+                    List.of(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 18000, 0),
+                            new StatusEffectInstance(StatusEffects.ABSORPTION, 9000, 5),
+                            new StatusEffectInstance(StatusEffects.REGENERATION, 2400, 1),
+                            new StatusEffectInstance(StatusEffects.HASTE, 1800, 2),
+                            new StatusEffectInstance(StatusEffects.REGENERATION, 100, 4),
+                            new StatusEffectInstance(StatusEffects.RESISTANCE, 60, 4)
+                    )
+            )).consumeSeconds(0.8f).build();
     public SichotianAppleItem() {
-        super(Items.GOLDEN_APPLE, Identifier.of(Incantatium.LOGGER.getName(),"sichotian_apple"), "incantatium.sichotian_apple.name", true);
+        super(Items.GOLDEN_APPLE, Identifier.of(Incantatium.LOGGER.getName(),"sichotian_apple"), "incantatium.sichotian_apple.name", Incantatium.getModel(Incantatium.id("sichotian_apple")));
 
 
         String s = "Sichotian Apple";
@@ -49,7 +56,8 @@ public class SichotianAppleItem extends CustomRecipeItem<CraftingRecipeInput> {
             }else name.append(Text.literal(String.valueOf(s.charAt(i))).withColor(rgbToInt(nums[i-spaces])));
         }
         addComponent(DataComponentTypes.CUSTOM_NAME, name.setStyle(Style.EMPTY.withItalic(false)));
-        addComponent(DataComponentTypes.FOOD, SICHOTIAN_APPLE);
+        addComponent(DataComponentTypes.FOOD, SICHOTIAN_APPLE_HUNGER);
+        addComponent(DataComponentTypes.CONSUMABLE, SICHOTIAN_APPLE_EFFECTS);
         addComponent(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
     }
 

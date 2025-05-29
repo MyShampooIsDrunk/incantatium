@@ -9,4 +9,5 @@ import java.util.Set;
 public interface OrnamentAbilities extends ServerTickingComponent {
     Map<Identifier, Integer> getCooldowns();
     Set<Identifier> getActive();
+    boolean isActive(Identifier id);
 }

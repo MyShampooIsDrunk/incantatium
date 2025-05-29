@@ -8,10 +8,8 @@ import myshampooisdrunk.incantatium.items.DivineCrownItem;
 import myshampooisdrunk.incantatium.items.SichotianAppleItem;
 import myshampooisdrunk.incantatium.items.ThunderstormItem;
 import myshampooisdrunk.incantatium.items.TimeStopItem;
-import myshampooisdrunk.incantatium.items.ornaments.AbstractOrnamentItem;
-import myshampooisdrunk.incantatium.items.ornaments.EnduranceOrnamentItem;
-import myshampooisdrunk.incantatium.items.ornaments.RevelationOrnamentItem;
-import myshampooisdrunk.incantatium.items.ornaments.SalvationOrnamentItem;
+import myshampooisdrunk.incantatium.items.ornaments.*;
+import myshampooisdrunk.incantatium.multiblock.IncantatiumMultiblockRegistry;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -27,11 +25,16 @@ public class IncantatiumRegistry {
 
     public static final AbstractCustomItem DIVINE_CROWN = CustomItemRegistry.registerItem(new DivineCrownItem());
     public static final AbstractCustomItem TIME_STOP_SWORD = CustomItemRegistry.registerItem(new TimeStopItem());
-    public static final AbstractCustomItem THUNDERSTORM_ITEM = CustomItemRegistry.registerWithRecipe(new ThunderstormItem());
-    public static final AbstractCustomItem SICHOTIAN_APPLE = CustomItemRegistry.registerWithRecipe(new SichotianAppleItem());
+    public static final ThunderstormItem THUNDERSTORM_ITEM = (ThunderstormItem)CustomItemRegistry.registerWithRecipe(new ThunderstormItem());
+    public static final SichotianAppleItem SICHOTIAN_APPLE = (SichotianAppleItem)CustomItemRegistry.registerWithRecipe(new SichotianAppleItem());
+
     public static final AbstractCustomItem REVELATION_ORNAMENT = CustomItemRegistry.registerItem(new RevelationOrnamentItem());
     public static final AbstractCustomItem ENDURANCE_ORNAMENT = CustomItemRegistry.registerItem(new EnduranceOrnamentItem());
     public static final AbstractCustomItem SALVATION_ORNAMENT = CustomItemRegistry.registerItem(new SalvationOrnamentItem());
+    public static final AbstractCustomItem CONSTITUTION_ORNAMENT = CustomItemRegistry.registerItem(new ConstitutionOrnamentItem());
+    public static final AbstractCustomItem GALE_ORNAMENT = CustomItemRegistry.registerItem(new GaleOrnamentItem());
+    public static final AbstractCustomItem CYCLONE_ORNAMENT = CustomItemRegistry.registerItem(new CycloneOrnamentItem());
+    public static final AbstractCustomItem HYDROUS_ORNAMENT = CustomItemRegistry.registerItem(new HydrousOrnamentItem());
 
     public static final CustomPotion BROKEN_ARMOR = CustomPotion.builder()
             .addEffect(
@@ -43,6 +46,7 @@ public class IncantatiumRegistry {
             .build(Incantatium.id("broken_armor"));
 
     public static void init(){
+        IncantatiumMultiblockRegistry.init();
         CustomItemRegistry.registerRecipe(
                 new ShapedRecipe("", CraftingRecipeCategory.MISC, RawShapedRecipe.create(
                         Map.of('G', Ingredient.ofItems(Items.GOLD_BLOCK),

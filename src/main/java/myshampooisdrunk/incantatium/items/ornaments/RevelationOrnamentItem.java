@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.TeamS2CPacket;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
@@ -38,7 +39,7 @@ public class RevelationOrnamentItem extends AbstractOrnamentItem{
         boolean bl = false;
         if(entity instanceof PlayerEntity p ) {
             OrnamentAbilities abilities = p.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY);
-            if(abilities.getActive().contains(identifier)) {
+            if(abilities.isActive(identifier)) {
                 if(stack == p.getOffHandStack()) {
                     bl = true;
                 }
@@ -47,7 +48,7 @@ public class RevelationOrnamentItem extends AbstractOrnamentItem{
 
         OrnamentAbilities abilities;
 
-        if(entity instanceof ServerPlayerEntity sp && (abilities = sp.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY)).getActive().contains(identifier)){
+        if(entity instanceof ServerPlayerEntity sp && (abilities = sp.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY)).isActive(identifier)){
             Toggle toggle = sp.getComponent(Incantatium.TOGGLE_COMPONENT_KEY);
             Team team = new Team(sp.getScoreboard(),"aaaaaaaaaaaaaaaaaaaaaaaaaatijkaitjidjhdlhf");
             team.setShowFriendlyInvisibles(true);
@@ -70,13 +71,14 @@ public class RevelationOrnamentItem extends AbstractOrnamentItem{
     }
 
     @Override
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable cir) {
+    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         super.use(world, user, hand, cir);
         if(canUse(user, hand)){
             List<Entity> entities = world.getOtherEntities(user, Box.of(user.getPos(),50,50,50), e -> e instanceof MobEntity);
             entities.forEach(e -> {
                 if (e instanceof LivingEntity l) l.setStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 400), user);
             });
-        }
+            cir.setReturnValue(ActionResult.SUCCESS);
+        } else cir.setReturnValue(ActionResult.FAIL);
     }
 }

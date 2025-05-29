@@ -9,6 +9,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,10 +39,11 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
         if(e.getActive()) ci.cancel();
     }
 
-    @Redirect(method="damage",at=@At(value = "INVOKE",target = "Lnet/minecraft/server/network/ServerPlayerEntity;isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z"))
-    public boolean dontDamageIfEndurance(ServerPlayerEntity instance, DamageSource damageSource){
+    @Redirect(method="damage",at=@At(value = "INVOKE",target = "Lnet/minecraft/server/network/ServerPlayerEntity;isInvulnerableTo(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/damage/DamageSource;)Z"))
+    public boolean dontDamageIfEndurance(ServerPlayerEntity instance, ServerWorld world, DamageSource source){
         EnduranceEffect e = instance.getComponent(Incantatium.ENDURANCE_COMPONENT_KEY);
-        return instance.isInvulnerableTo(damageSource) || e.getActive();
+        if(e.getActive()) return true;
+        return instance.isInvulnerableTo(world, source);
     }
 
     private ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {

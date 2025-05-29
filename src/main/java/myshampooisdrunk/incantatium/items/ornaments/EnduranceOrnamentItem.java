@@ -4,6 +4,7 @@ import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.component.EnduranceEffect;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -25,7 +26,7 @@ public class EnduranceOrnamentItem extends AbstractOrnamentItem{
     }
 
     @Override
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable cir) {
+    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         super.use(world, user, hand, cir);
         if(canUse(user, hand)){
             EnduranceEffect e = user.getComponent(Incantatium.ENDURANCE_COMPONENT_KEY);

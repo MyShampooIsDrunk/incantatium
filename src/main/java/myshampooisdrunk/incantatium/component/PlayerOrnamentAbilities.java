@@ -39,6 +39,11 @@ public class PlayerOrnamentAbilities implements OrnamentAbilities{
     }
 
     @Override
+    public boolean isActive(Identifier id) {
+        return active.contains(id);
+    }
+
+    @Override
     public void serverTick() {
         ItemStack stack;
         Identifier id;
@@ -69,7 +74,7 @@ public class PlayerOrnamentAbilities implements OrnamentAbilities{
 //                System.out.println(+ " is the new val of i and i has been put");
                 if(i == COOLDOWN) {
                     active.add(id);
-                    player.sendMessage(Text.literal(id + " was activated").styled(s -> s.withColor(Colors.GREEN)));
+                    player.sendMessage(Text.literal(id + " was activated").styled(s -> s.withColor(Colors.GREEN)), false);
                 }
             }
         } else {
@@ -82,7 +87,7 @@ public class PlayerOrnamentAbilities implements OrnamentAbilities{
                 int j = cooldowns.get(i);
                 if(j == 0) {
                     cooldowns.remove(i);
-                    if(active.contains(i)) player.sendMessage(Text.literal(i + " was deactivated").styled(s -> s.withColor((Colors.LIGHT_RED))));
+                    if(active.contains(i)) player.sendMessage(Text.literal(i + " was deactivated").styled(s -> s.withColor((Colors.LIGHT_RED))), false);
                     active.remove(i);
                 }
                 else cooldowns.put(i, j - 1);

@@ -5,11 +5,13 @@ import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.component.OrnamentAbilities;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.component.type.UseCooldownComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -19,17 +21,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.management.Attribute;
 import java.util.Objects;
+import java.util.Optional;
 
 public abstract class AbstractOrnamentItem extends AbstractCustomItem {
     private final int cooldown; //in ticks
+    private final UseCooldownComponent cooldownComponent;
 
     public AbstractOrnamentItem(Identifier identifier, @Nullable String itemName, int cooldown) {
-        super(Items.INK_SAC,identifier, itemName, true);
+        super(Items.FERMENTED_SPIDER_EYE, identifier, itemName);//Incantatium.getModel(identifier)
         this.cooldown = Incantatium.DEV_MODE ? 600 : cooldown;
+        this.cooldownComponent = new UseCooldownComponent(cooldown/20f, Optional.of(Incantatium.id("ornament_cooldown")));
+        addComponent(DataComponentTypes.USE_COOLDOWN, cooldownComponent);
     }
 
     public void cooldownItems(PlayerEntity p){
-        p.getItemCooldownManager().set(Items.INK_SAC,cooldown);
+        p.getItemCooldownManager().set(Incantatium.id("ornament_cooldown"),cooldown);
     }
 
     public int getCooldown() {
@@ -39,7 +45,7 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
     public boolean canUse(PlayerEntity p, Hand hand){
         if(hand == Hand.OFF_HAND) {
             OrnamentAbilities abilities = p.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY);
-            return abilities.getActive().contains(identifier);
+            return abilities.isActive(identifier);
         }
         return false;
     }
@@ -49,10 +55,10 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected, CallbackInfo ci) {
 //        boolean modified = false;
-        if(entity instanceof PlayerEntity p){
+        if(entity instanceof PlayerEntity p && !world.isClient()){
             AttributeModifiersComponent attrMods = AttributeModifiersComponent.DEFAULT;
             OrnamentAbilities abilities = p.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY);
-            if(abilities.getActive().contains(identifier)) {
+            if(abilities.isActive(identifier)) {
 //                System.out.println("ability is active");
                 if(!Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
 //                    System.out.println("skiby dee");
@@ -62,7 +68,7 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
                 attrMods = getAttributeModifiers();
                 if(stack == p.getOffHandStack()) getActiveEffects(stack, world, p);
             }
-            else if(!abilities.getActive().contains(identifier) && Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
+            else if(!abilities.isActive(identifier) && Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
                 stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, false);
 //                modified = true;
             }
@@ -78,7 +84,7 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
     }
 
     @Override
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable cir) {
+    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         super.use(world, user, hand, cir);
         if(canUse(user, hand))
             cooldownItems(user);

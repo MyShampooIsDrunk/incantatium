@@ -1,59 +1,50 @@
 package myshampooisdrunk.incantatium.items;
 
+import com.mojang.datafixers.util.Either;
 import myshampooisdrunk.drunk_server_toolkit.item.AbstractCustomItem;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
+import net.minecraft.component.type.EquippableComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
-import net.minecraft.item.Equipment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.equipment.EquipmentType;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-public abstract class AbstractCustomArmorItem extends AbstractCustomItem implements Equipment {
-    private final ArmorItem.Type type;
+public abstract class AbstractCustomArmorItem extends AbstractCustomItem {
 
-    public AbstractCustomArmorItem(Item item, Identifier identifier, ArmorItem.Type type) {
+    private final EquippableComponent component;
+
+    public AbstractCustomArmorItem(Item item, Identifier identifier, EquipmentType type) {
         super(item, identifier);
-        this.type=type;
+        this.component=EquippableComponent.builder(type.getEquipmentSlot()).build();
+        addComponent(DataComponentTypes.EQUIPPABLE, component);
+
     }
 
-    public AbstractCustomArmorItem(Item item, Identifier identifier, @Nullable String itemName, ArmorItem.Type type) {
+    public AbstractCustomArmorItem(Item item, Identifier identifier, @Nullable String itemName, EquipmentType type) {
         super(item, identifier, itemName);
-        this.type=type;
+        this.component=EquippableComponent.builder(type.getEquipmentSlot()).build();
+        addComponent(DataComponentTypes.EQUIPPABLE, component);
     }
 
-    public AbstractCustomArmorItem(Item item, Identifier identifier, @Nullable String itemName, boolean customModel, ArmorItem.Type type) {
-        super(item, identifier, itemName, customModel);
-        this.type=type;
+    public AbstractCustomArmorItem(Item item, Identifier identifier, @Nullable String itemName, @Nullable Either<CustomModelDataComponent, Identifier> customModelData, EquippableComponent component) {
+        super(item, identifier, itemName, customModelData);
+        this.component = component;
+        addComponent(DataComponentTypes.EQUIPPABLE, component);
     }
 
-    @Override
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable cir) {
-        if(world instanceof ServerWorld sWorld) sWorld.playSound(user,user.getBlockPos().up(), getEquipSound().value(), SoundCategory.PLAYERS,1f,1f);
-        cir.setReturnValue(this.equipAndSwap(this.item, world, user, hand));
-    }
-
-    @Override
-    public EquipmentSlot getSlotType() {
-        return type.getEquipmentSlot();
-    }
-
-    @Override
-    public RegistryEntry<SoundEvent> getEquipSound() {//feel free to override this
-        return Equipment.super.getEquipSound();
-    }
-
-    @Override
-    public TypedActionResult<ItemStack> equipAndSwap(Item item, World world, PlayerEntity user, Hand hand) {
-        return Equipment.super.equipAndSwap(item, world, user, hand);
+    public EquippableComponent getEquipmentComponent() {
+        return component;
     }
 }

@@ -2,21 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:breeze_rod"
-    },
-    "C": {
-      "item": "minecraft:end_crystal"
-    },
-    "E": {
-      "item": "minecraft:echo_shard"
-    },
-    "N": {
-      "item": "minecraft:nautilus_shell"
-    },
-    "T": {
-      "item": "minecraft:totem_of_undying"
-    }
+    "B": "minecraft:breeze_rod",
+    "C": "minecraft:end_crystal",
+    "E": "minecraft:echo_shard",
+    "N": "minecraft:nautilus_shell",
+    "T": "minecraft:totem_of_undying"
   },
   "pattern": [
     "BNE",
@@ -28,13 +18,21 @@
       "minecraft:custom_data": {
         "custom_item": "incantatium:thunderstorm_item"
       },
-      "minecraft:custom_model_data": 1,
+      "minecraft:custom_model_data": {
+        "strings": [
+          "thunderstorm_item"
+        ]
+      },
       "minecraft:enchantment_glint_override": true,
       "minecraft:item_name": "\"Aspect of Thunder\"",
       "minecraft:max_stack_size": 16,
-      "minecraft:rarity": "rare"
+      "minecraft:rarity": "rare",
+      "minecraft:use_cooldown": {
+        "cooldown_group": "incantatium:thunderstorm_item",
+        "seconds": 5.0
+      }
     },
     "count": 1,
-    "id": "minecraft:ghast_tear"
+    "id": "minecraft:fermented_spider_eye"
   }
 }
