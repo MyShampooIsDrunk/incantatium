@@ -5,6 +5,7 @@ import myshampooisdrunk.drunk_server_toolkit.multiblock.structure.MultiblockStru
 import myshampooisdrunk.incantatium.util.BoxPolyhedron;
 import myshampooisdrunk.incantatium.util.BoxPolyhedronDecomposer;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.AttributeContainer;
@@ -15,10 +16,13 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.AffineTransformation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -28,17 +32,6 @@ import java.util.*;
 public record SolidHitboxGenerator(Set<Box> hitboxes, Map<Box, BlockState> blocks){
     public Map<Vec3d, List<AbstractHitboxEntity<?>>> createAndGetEntities(Vec3d relative) {
         Map<Vec3d, List<AbstractHitboxEntity<?>>> map = new HashMap<>();
-        BoxPolyhedronDecomposer decomposer = BoxPolyhedronDecomposer.decomposer(hitboxes);
-        Map<Vec3d, Double> ideal = decomposer.decompose();
-        ideal.forEach((v, d) -> {
-            SolidHitboxEntity entity = new SolidHitboxEntity(d.floatValue());
-            List<AbstractHitboxEntity<?>> ents;
-            Vec3d v2 = v.subtract(0.5,1-d/2,0.5).add(relative);
-            if(!map.containsKey(v2)) ents = new ArrayList<>();
-            else ents = map.get(v2);
-            ents.add(entity);
-            map.put(v2, ents);
-        });
 
         HashMap<BlockState,Set<Box>> stateBoxes = new HashMap<>();
         for (Box box : blocks.keySet()) {
@@ -59,19 +52,23 @@ public record SolidHitboxGenerator(Set<Box> hitboxes, Map<Box, BlockState> block
                 if(!map.containsKey(v2)) ents = new ArrayList<>();
                 else ents = map.get(v2);
                 BlockHitboxEntity e1 = new BlockHitboxEntity(s, d.floatValue());
-                SolidHitboxEntity e2 = new SolidHitboxEntity(d.floatValue());
                 ents.add(e1);
                 map.put(v2,ents);
-
-                Vec3d v3 = v.subtract(0.5,1-d/2,0.5).add(relative);
-                if(!map.containsKey(v3)) ents = new ArrayList<>();
-                else ents = map.get(v3);
-                ents.add(e2);
-                map.put(v3,ents);
             });
         });
 
         return map;
+    }
+
+    public VoxelShape getShape() {
+        VoxelShape ret = VoxelShapes.empty();
+        for (Box box : hitboxes) {
+            ret = VoxelShapes.union(ret, VoxelShapes.cuboid(box));
+        }
+        for (Box box : blocks.keySet()) {
+            ret = VoxelShapes.union(ret, VoxelShapes.cuboid(box));
+        }
+        return ret;
     }
 
     public static Builder builder() {
@@ -89,31 +86,6 @@ public record SolidHitboxGenerator(Set<Box> hitboxes, Map<Box, BlockState> block
             this(type, id, 1);
         }
         public float getSizeMultiplier() {return sizeMultiplier;}
-    }
-
-    public static class SolidHitboxEntity extends AbstractHitboxEntity<ShulkerEntity> {
-        public SolidHitboxEntity() {
-            super(EntityType.SHULKER, "solid_hitbox");
-        }
-
-        public SolidHitboxEntity(float sizeMultiplier) {
-            super(EntityType.SHULKER, "solid_hitbox", sizeMultiplier);
-        }
-
-        @Override
-        public void tick(Entity me, CallbackInfo ci) {
-            tick(true, me, ci);
-        }
-
-        @Override
-        public ShulkerEntity create(ServerWorld world, MultiblockStructure structure, BlockPos center, Vec3d relative){
-            ShulkerEntity shulker = super.create(world,structure,center,relative);
-            shulker.refreshPositionAndAngles(relative.add(center.toCenterPos()),0 ,0);
-            shulker.setInvisible(true);
-            shulker.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false));
-            shulker.getAttributes().getCustomInstance(EntityAttributes.SCALE).setBaseValue(getSizeMultiplier());
-            return shulker;
-        }
     }
 
     public static class BlockHitboxEntity extends AbstractHitboxEntity<DisplayEntity.BlockDisplayEntity> {

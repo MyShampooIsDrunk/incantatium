@@ -6,12 +6,8 @@
     "S S"
   ],
   "key": {
-    "S": {
-      "item": "minecraft:string"
-    },
-    "s": {
-      "item": "minecraft:slime_block"
-    }
+    "S": "minecraft:string",
+    "s": "minecraft:slime_block"
   },
   "result": {
     "id": "minecraft:cobweb",

@@ -18,23 +18,23 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ShulkerEntity.class)
 public abstract class ShulkerEntityMixin extends GolemEntity{
 
-    @Redirect(method = "setPosition",at= @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/ShulkerEntity;hasVehicle()Z", ordinal = 0))
-    public boolean modifyHasVehicle(ShulkerEntity instance){
-        if(!instance.getWorld().isClient()) {
-            String id;
-            if(this.getAttributes() != null && this.brain != null && this.writeNbt(new NbtCompound()).contains("cardinal_components")) {
-                MultiblockData data = this.getComponent(DST.ENTITY_MULTIBLOCK_DATA_COMPONENT_KEY);
-                if ((id = data.getEntityId()) != null) {
-                    AbstractMultiblockStructureEntity<? extends Entity> structureEntity = MultiblockRegistry.ENTITY_TYPES.get(id).defaultEntity();
-                    if (structureEntity instanceof SolidHitboxGenerator.SolidHitboxEntity s) {
-                        return true;
-                    }
-                }
-            }
-            return this.hasVehicle();
-        }
-        return this.hasVehicle();
-    }
+//    @Redirect(method = "setPosition",at= @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/ShulkerEntity;hasVehicle()Z", ordinal = 0))
+//    public boolean modifyHasVehicle(ShulkerEntity instance){
+//        if(!instance.getWorld().isClient()) {
+//            String id;
+//            if(this.getAttributes() != null && this.brain != null && this.writeNbt(new NbtCompound()).contains("cardinal_components")) {
+//                MultiblockData data = this.getComponent(DST.ENTITY_MULTIBLOCK_DATA_COMPONENT_KEY);
+//                if ((id = data.getEntityId()) != null) {
+//                    AbstractMultiblockStructureEntity<? extends Entity> structureEntity = MultiblockRegistry.ENTITY_TYPES.get(id).defaultEntity();
+//                    if (structureEntity instanceof SolidHitboxGenerator.SolidHitboxEntity s) {
+//                        return true;
+//                    }
+//                }
+//            }
+//            return this.hasVehicle();
+//        }
+//        return this.hasVehicle();
+//    }
 
     public ShulkerEntityMixin(EntityType<? extends GolemEntity> type, World world) {
         super(type, world);

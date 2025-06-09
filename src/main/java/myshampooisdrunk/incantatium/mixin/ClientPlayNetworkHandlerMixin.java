@@ -10,5 +10,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class ClientPlayNetworkHandlerMixin {
     @Redirect(method = "onTeam", at=@At(value = "INVOKE",target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;[Ljava/lang/Object;)V"))
     public void noWarn(Logger instance, String s, Object[] objects){
+        return;
     }
 }
