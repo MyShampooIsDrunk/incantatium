@@ -2,6 +2,7 @@ package myshampooisdrunk.incantatium.multiblock;
 
 import io.netty.buffer.ByteBuf;
 import myshampooisdrunk.drunk_server_toolkit.multiblock.structure.MultiblockStructure;
+import myshampooisdrunk.incantatium.multiblock.entity.RitualCoreEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.network.codec.PacketCodec;
@@ -47,6 +48,7 @@ public class RitualMultiblock extends MultiblockStructure {
                 else if(Math.abs(i) == 2 && Math.abs(j) == 2) flag = 3;
 //                switch(flag):
             }
+        setCore(new RitualCoreEntity("ritual_core"));
     }
 
     public enum Direction implements StringIdentifiable {

@@ -12,7 +12,10 @@
 			"incantatium:riptide_cooldown",
 			"incantatium:ornament_abilities",
 			"incantatium:toggle_state",
-			"incantatium:endurance_effect"
+			"incantatium:endurance_effect",
+			"incantatium:inventory_storage",
+			"incantatium:pedestal_storage",
+			"incantatium:pedestal_text"
 		]
 	},
 	"contact": {

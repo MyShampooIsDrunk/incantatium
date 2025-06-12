@@ -57,6 +57,12 @@ public class Incantatium implements ModInitializer {
 			id("toggle_state"), PlayerToggle.class);
 	public static final ComponentKey<PlayerEnduranceEffect> ENDURANCE_COMPONENT_KEY = ComponentRegistry.getOrCreate(
 			id("endurance_effect"), PlayerEnduranceEffect.class);
+	public static final ComponentKey<CoreInventoryStorage> INVENTORY_STORAGE_COMPONENT_KEY = ComponentRegistry.getOrCreate(
+			id("inventory_storage"), CoreInventoryStorage.class);
+	public static final ComponentKey<PedestalInventoryStorage> PEDESTAL_STORAGE_COMPONENT_KEY = ComponentRegistry.getOrCreate(
+			id("pedestal_storage"), PedestalInventoryStorage.class);
+	public static final ComponentKey<PedestalTextDisplay> PEDESTAL_TEXT_COMPONENT_KEY = ComponentRegistry.getOrCreate(
+			id("pedestal_text"), PedestalTextDisplay.class);
 
 	@Override
 	public void onInitialize() {
