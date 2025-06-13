@@ -65,6 +65,7 @@ public class MultiblockInventory implements Inventory {
         Entry e = this.heldStacks.get(slot);
         if(amount <= 0 || e.stack == null || e.stack.isEmpty() || amount > e.stack.getMaxCount()) return ItemStack.EMPTY;
         amount = Math.min(amount, e.count);
+        if (e.count == amount) return heldStacks.set(slot, EMPTY).stack();
         heldStacks.set(slot, e.withCount(e.count - amount));
         return e.stack.copyWithCount(amount);
     }
