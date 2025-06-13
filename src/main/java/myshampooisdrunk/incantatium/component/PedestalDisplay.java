@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface PedestalDisplay extends Component {
     void update();
     void setStorageSlot(int slot);
+    int getStorageSlot();
 }

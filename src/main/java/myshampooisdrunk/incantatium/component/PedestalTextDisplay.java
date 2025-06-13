@@ -12,7 +12,7 @@ import net.minecraft.util.math.Box;
 import java.util.Comparator;
 import java.util.List;
 
-public class PedestalTextDisplay implements PedestalDisplay{
+public class PedestalTextDisplay implements PedestalDisplay {
     private final DisplayEntity.TextDisplayEntity entity;
     private int slot;
 
@@ -31,15 +31,20 @@ public class PedestalTextDisplay implements PedestalDisplay{
                     });
             disps.sort(Comparator.comparingDouble(t -> t.squaredDistanceTo(entity)));
             if(!disps.isEmpty()) {
-                entity.setText(Text.literal("" + disps.getFirst().getComponent(Incantatium.PEDESTAL_STORAGE_COMPONENT_KEY).getEntry().count()));
+                int count = disps.getFirst().getComponent(Incantatium.PEDESTAL_STORAGE_COMPONENT_KEY).getEntry().count();
+                entity.setText(Text.literal(count == 0 ? "" : String.valueOf(count)));
             }
         }
-//        entity.setText(); //...
     }
 
     @Override
     public void setStorageSlot(int slot) {
         this.slot = slot;
+    }
+
+    @Override
+    public int getStorageSlot() {
+        return slot;
     }
 
     @Override

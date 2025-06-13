@@ -1,6 +1,11 @@
+
 plugins {
 	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/incantatium.accessWidener")
 }
 
 version = project.mod_version
@@ -97,3 +102,4 @@ publishing {
 		// retrieving dependencies.
 	}
 }
+

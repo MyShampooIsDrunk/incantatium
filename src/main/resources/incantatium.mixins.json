@@ -9,6 +9,7 @@
     "ItemsMixin",
     "LivingEntityMixin",
     "MinecraftServerMixin",
+    "MultiblockStructureAccessor",
     "PendingTickersAccessor",
     "PlayerInventoryMixin",
     "ScoreboardMixin",

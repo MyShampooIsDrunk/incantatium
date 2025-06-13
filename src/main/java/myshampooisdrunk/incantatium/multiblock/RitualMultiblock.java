@@ -1,32 +1,39 @@
 package myshampooisdrunk.incantatium.multiblock;
 
 import io.netty.buffer.ByteBuf;
+import myshampooisdrunk.drunk_server_toolkit.DST;
+import myshampooisdrunk.drunk_server_toolkit.component.MultiblockCoreData;
+import myshampooisdrunk.drunk_server_toolkit.multiblock.entity.AbstractMultiblockStructureEntity;
 import myshampooisdrunk.drunk_server_toolkit.multiblock.structure.MultiblockStructure;
+import myshampooisdrunk.incantatium.mixin.MultiblockStructureAccessor;
+import myshampooisdrunk.incantatium.multiblock.entity.PedestalEntityGenerator;
 import myshampooisdrunk.incantatium.multiblock.entity.RitualCoreEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.function.ValueLists;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.IntFunction;
 
 public class RitualMultiblock extends MultiblockStructure {
     private static final double RT2 = Math.sqrt(2);
 
+    private final Map<Integer, Vec3d> slotEntityOffsets;
+
     public RitualMultiblock(Identifier id) {
         super(id, Blocks.ENCHANTING_TABLE);
+        this.slotEntityOffsets = new HashMap<>();
         addBlock(0,-1,0, Blocks.NETHERITE_BLOCK);
         addBlock(-1,-1,0, Blocks.ENDER_CHEST);
         addBlock(1,-1,0, Blocks.ENDER_CHEST);
@@ -49,6 +56,38 @@ public class RitualMultiblock extends MultiblockStructure {
 //                switch(flag):
             }
         setCore(new RitualCoreEntity("ritual_core"));
+    }
+
+    public void attachPedestalEntity(Vec3d relative, PedestalEntityGenerator.PedestalEntity p,
+                                     PedestalEntityGenerator.PedestalEntityText t, int slot) {
+        slotEntityOffsets.put(slot, relative);
+        attachEntity(relative, p);
+        attachEntity(relative, t);
+    }
+
+    public BlockPos centerFromPedestal(Vec3d pedestal, int slot) {
+        Vec3d relative = slotEntityOffsets.get(slot);
+        return BlockPos.ofFloored(pedestal.subtract(relative));
+    }
+
+    public Box getEntityBox() {
+        return ((MultiblockStructureAccessor)this).getEntityBox();
+    }
+
+    public DisplayEntity.ItemDisplayEntity getRitualCoreEntity(ServerWorld world, BlockPos pos) {
+        List<DisplayEntity.ItemDisplayEntity> entities = world.getEntitiesByType(
+                EntityType.ITEM_DISPLAY,
+                this.getEntityBox().offset(pos).expand(1),
+                e -> {
+                    if(e instanceof DisplayEntity.ItemDisplayEntity core) {
+                        MultiblockCoreData coreData = core.getComponent(DST.MULTIBLOCK_CORE_DATA_COMPONENT_KEY);
+                        return !coreData.getBlockstateData().isEmpty();
+                    }
+                    return false;
+                });
+        entities.sort(Comparator.comparingDouble(t -> t.squaredDistanceTo(pos.toCenterPos())));
+        if(entities.isEmpty()) return null;
+        return entities.getFirst();
     }
 
     public enum Direction implements StringIdentifiable {

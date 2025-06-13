@@ -12,8 +12,13 @@ import java.util.Map;
 public interface InventoryStorage extends Component {
 
     MultiblockInventory getInventory();
+
     default MultiblockInventory.Entry getStack(int slot) {
         return getInventory().get(slot);
+    }
+
+    default void setSlot(MultiblockInventory.Entry entry, int slot) {
+        getInventory().set(entry, slot);
     }
 
     default boolean tryAddStack(int slot, ItemStack stack) {

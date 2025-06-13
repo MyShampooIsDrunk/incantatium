@@ -18,22 +18,10 @@ public class MultiblockInventory implements Inventory {
     public static final Entry EMPTY = new Entry(ItemStack.EMPTY, 0);
     private final int size;
     private final DefaultedList<Entry> heldStacks;
-    private final DynamicRegistryManager registryManager;
 
-    public MultiblockInventory(int size, DynamicRegistryManager registryManager) {
+    public MultiblockInventory(int size) {
         this.size = size;
         heldStacks = DefaultedList.ofSize(size, EMPTY);
-        this.registryManager = registryManager;
-    }
-
-    public MultiblockInventory(DynamicRegistryManager registryManager, ItemStack... stacks) {
-        size = stacks.length;
-        Entry[] entries = new Entry[size];
-        for (int i = 0; i < stacks.length; i++) {
-            entries[i] = new Entry(stacks[i], stacks[i].getCount());
-        }
-        heldStacks = DefaultedList.copyOf(EMPTY, entries);
-        this.registryManager = registryManager;
     }
 
     @Override
@@ -53,6 +41,10 @@ public class MultiblockInventory implements Inventory {
     @Override
     public ItemStack getStack(int slot) {
         return slot >= 0 && slot < this.heldStacks.size() ? this.heldStacks.get(slot).stack : ItemStack.EMPTY;
+    }
+
+    public void set(Entry entry, int slot) {
+        this.heldStacks.set(slot, entry);
     }
 
     public Entry getStackQuantity(int slot) {
@@ -102,10 +94,14 @@ public class MultiblockInventory implements Inventory {
     }
 
     public boolean addStack(int slot, ItemStack stack) {
-        if(slot < 0 || slot >= this.heldStacks.size()) return false;
+        if(slot < 0 || slot >= this.heldStacks.size() || stack.isEmpty()) return false;
         Entry e;
-        if(ItemStack.areItemsAndComponentsEqual((e = heldStacks.get(slot)).stack, stack)) {
-            this.heldStacks.set(slot, new Entry(stack, e.count + stack.getCount()));
+        if((e = this.heldStacks.get(slot)).isEmpty()) {
+            this.heldStacks.set(slot, new Entry(stack));
+            return true;
+        }
+        if(ItemStack.areItemsAndComponentsEqual(e.stack, stack)) {
+            this.heldStacks.set(slot, new Entry(e.stack, e.count + stack.getCount()));
             return true;
         }
         return false;
@@ -129,27 +125,27 @@ public class MultiblockInventory implements Inventory {
         return this.heldStacks.stream().filter(stack -> !stack.isEmpty()).toList().toString();
     }
 
-    public NbtList toNbt() {
+    public NbtList toNbt(RegistryWrapper.WrapperLookup wrapperLookup) {
         NbtList list = new NbtList();
         for (int i = 0; i < heldStacks.size(); i++) {
             NbtCompound c = new NbtCompound();
             c.putByte("Slot", (byte)i);
             Entry e = heldStacks.get(i);
             c.putInt("Count", e.count);
-            list.add(e.stack.copyWithCount(1).toNbt(registryManager, c));
+            list.add(e.stack.copyWithCount(1).toNbt(wrapperLookup, c));
         }
 //        NbtCompound ret = new NbtCompound();
 //        ret.put("Inventory", list);
         return list;
     }
 
-    public void readNbt(NbtCompound compound) {
+    public void readNbt(NbtCompound compound, RegistryWrapper.WrapperLookup wrapperLookup) {
         this.heldStacks.clear();
         NbtList list = compound.getList("Inventory", NbtElement.COMPOUND_TYPE);
         for (int i = 0; i < list.size(); i++) {
             NbtCompound nbtCompound = list.getCompound(i);
             int j = nbtCompound.getByte("Slot") & 255;
-            ItemStack itemStack = ItemStack.fromNbt(registryManager, nbtCompound).orElse(ItemStack.EMPTY);
+            ItemStack itemStack = ItemStack.fromNbt(wrapperLookup, nbtCompound).orElse(ItemStack.EMPTY);
             if (j < this.heldStacks.size()) {
                 int count = nbtCompound.getInt("Count");
                 Entry e = new Entry(itemStack, count);
@@ -165,6 +161,10 @@ public class MultiblockInventory implements Inventory {
         private Entry(ItemStack stack, int count) {
             this.stack = stack;
             this.count = count;
+        }
+
+        private Entry(ItemStack stack) {
+            this(stack, stack.getCount());
         }
 
         public int count(){return count;}

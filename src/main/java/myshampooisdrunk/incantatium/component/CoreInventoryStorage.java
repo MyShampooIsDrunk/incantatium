@@ -8,7 +8,7 @@ import net.minecraft.registry.RegistryWrapper;
 public class CoreInventoryStorage implements InventoryStorage {
     private final MultiblockInventory inventory;
     public CoreInventoryStorage(DisplayEntity.ItemDisplayEntity display) {
-        inventory = new MultiblockInventory(8, display.getRegistryManager());
+        inventory = new MultiblockInventory(8);
     }
 
     @Override
@@ -18,11 +18,11 @@ public class CoreInventoryStorage implements InventoryStorage {
 
     @Override
     public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
-        this.inventory.readNbt(nbtCompound);
+        this.inventory.readNbt(nbtCompound, wrapperLookup);
     }
 
     @Override
     public void writeToNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
-        nbtCompound.put("Inventory",this.inventory.toNbt());
+        nbtCompound.put("Inventory",this.inventory.toNbt(wrapperLookup));
     }
 }
