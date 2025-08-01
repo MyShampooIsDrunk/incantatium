@@ -8,6 +8,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
@@ -97,20 +99,24 @@ public class PlayerOrnamentAbilities implements OrnamentAbilities{
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        NbtCompound cds = tag.getCompound("ornaments");
-        for (String key : cds.getKeys()) {
-            cooldowns.put(Identifier.of(key), cds.getInt(key));
+    public void readData(ReadView readView) {
+        for (ReadView ornament : readView.getListReadView("Ornaments")) {
+            Identifier id = Identifier.of(ornament.getString("id",""));
+            int ticks = ornament.getInt("ticks", 0);
+            cooldowns.put(id, ticks);
         }
-        String id = tag.getString("active");
-        if(!id.isEmpty())active.add(Identifier.of(id));
+        String id = readView.getString("Active", "");
+        if(!id.isEmpty()) active.add(Identifier.of("id"));
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        NbtCompound cds = new NbtCompound();
-        cooldowns.forEach((id, t) -> cds.putInt(id.toString(), t));
-        tag.put("ornaments",cds);
-        tag.putString("active", active.isEmpty() ? "" : active.toArray()[0].toString());
+    public void writeData(WriteView writeView) {
+        WriteView.ListView list = writeView.getList("Ornaments");
+        cooldowns.forEach((id, t) -> {
+            WriteView o = list.add();
+            o.putString("id", id.toString());
+            o.putInt("ticks", t);
+        });
+        writeView.putString("Active", active.isEmpty() ? "" : active.toArray()[0].toString());
     }
 }

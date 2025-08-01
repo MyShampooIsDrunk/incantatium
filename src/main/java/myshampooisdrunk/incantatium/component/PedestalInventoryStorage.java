@@ -12,6 +12,8 @@ import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 
 public class PedestalInventoryStorage implements InventorySlotStorage {
     private int slot;
@@ -92,21 +94,22 @@ public class PedestalInventoryStorage implements InventorySlotStorage {
     }
 
     @Override
-    public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
-        if(nbtCompound.contains("Slot")) {
-            this.slot = nbtCompound.getInt("Slot");
-            this.dirty = nbtCompound.getBoolean("Dirty");
-            this.singleton = MultiblockInventory.Singleton.fromNbt(nbtCompound, wrapperLookup);
+    public void readData(ReadView readView) {
+        int slot;
+        if((slot = readView.getInt("Slot", -1)) >= 0) {
+            this.slot = slot;
+            this.dirty = readView.getBoolean("Dirty", false);
+            this.singleton = MultiblockInventory.Singleton.parseData(readView);
             this.display.setItemStack(singleton.stack());
         }
     }
 
     @Override
-    public void writeToNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
+    public void writeData(WriteView writeView) {
         if(slot != -1) {
-            nbtCompound.putInt("Slot", slot);
-            nbtCompound.putBoolean("Dirty", dirty);
-            singleton.toNbt(nbtCompound, wrapperLookup);
+            writeView.putInt("Slot", slot);
+            writeView.putBoolean("Dirty", dirty);
+            singleton.writeData(writeView);
         }
     }
 }

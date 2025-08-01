@@ -7,7 +7,6 @@ import myshampooisdrunk.incantatium.server.ServerChunkTickManager;
 import myshampooisdrunk.incantatium.server.ServerChunkTickManagerInterface;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
-import net.minecraft.component.type.UnbreakableComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.server.MinecraftServer;
@@ -18,6 +17,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Unit;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -61,13 +61,13 @@ public class TimeStopItem extends AbstractCustomItem {
                                 .setStyle(Style.EMPTY.withItalic(false).withBold(true).withObfuscated(true).withColor(Colors.RED)))
         );
         addComponent(DataComponentTypes.LORE, new LoreComponent(lore));
-        addComponent(DataComponentTypes.UNBREAKABLE, new UnbreakableComponent(true));
+        addComponent(DataComponentTypes.UNBREAKABLE, Unit.INSTANCE);
     }
 
     @Override
     public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable cir) {
         if(world.isClient()) return;
-        if(!((CustomItemCooldownManagerI)user).getCustomItemCooldownManager().isCoolingDown("time_stop")){
+        if(!((CustomItemCooldownManagerI)user).drunk_server_toolkit$getCustomItemCooldownManager().isCoolingDown("time_stop")){
             world.playSound(null,user.getBlockPos().up(), SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS,1f,1.5f);
             MinecraftServer server = world.getServer();
             ServerChunkTickManager man = ((ServerChunkTickManagerInterface) Objects.requireNonNull(server)).getServerChunkTickManager();
@@ -80,11 +80,11 @@ public class TimeStopItem extends AbstractCustomItem {
             man.addChunk(chunkMan);
             chunkMan.exempt(user);
             chunkMan.freezeFor(200);
-            ((CustomItemCooldownManagerI)user).getCustomItemCooldownManager().set("time_stop",ABILITY_COOLDOWN_TICKS);
+            ((CustomItemCooldownManagerI)user).drunk_server_toolkit$getCustomItemCooldownManager().set("time_stop",ABILITY_COOLDOWN_TICKS);
             user.getItemCooldownManager().set(user.getStackInHand(hand), ABILITY_COOLDOWN_TICKS);
         }else{
             user.sendMessage(Text.literal(String.format("There are %s second(s) left until you may use this item again",
-                            (int)(0.95+((CustomItemCooldownManagerI) user).getCustomItemCooldownManager()
+                            (int)(0.95+((CustomItemCooldownManagerI) user).drunk_server_toolkit$getCustomItemCooldownManager()
                                     .getCooldownProgress("time_stop",0)*(ABILITY_COOLDOWN_TICKS/20f))))
                     .setStyle(Style.EMPTY.withBold(true).withColor(Colors.LIGHT_RED).withItalic(false)), true);
         }
@@ -101,9 +101,9 @@ public class TimeStopItem extends AbstractCustomItem {
     @Override
     public void onSneak(boolean sneaking, PlayerEntity player, CallbackInfo ci){
         if(sneaking){
-            if(((CustomItemCooldownManagerI)player).getCustomItemCooldownManager().isCoolingDown("time_stop")){
+            if(((CustomItemCooldownManagerI)player).drunk_server_toolkit$getCustomItemCooldownManager().isCoolingDown("time_stop")){
                 player.sendMessage(Text.literal(String.format("There are %s second(s) left until you may use this item again",
-                                (int)(0.95+((CustomItemCooldownManagerI) player).getCustomItemCooldownManager()
+                                (int)(0.95+((CustomItemCooldownManagerI) player).drunk_server_toolkit$getCustomItemCooldownManager()
                                         .getCooldownProgress("time_stop",0)*(ABILITY_COOLDOWN_TICKS/20f))))
                         .setStyle(Style.EMPTY.withBold(true).withColor(Colors.LIGHT_RED).withItalic(false)), true);
             }else {

@@ -7,10 +7,12 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.UseCooldownComponent;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -51,7 +53,7 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
     protected abstract void getActiveEffects(ItemStack stack, World world, PlayerEntity player);
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected, CallbackInfo ci) {
+    public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, EquipmentSlot slot, CallbackInfo ci) {
         if(entity instanceof PlayerEntity p && !world.isClient()){
             AttributeModifiersComponent attrMods = AttributeModifiersComponent.DEFAULT;
             OrnamentAbilities abilities = p.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY);

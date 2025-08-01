@@ -15,8 +15,8 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.decoration.InteractionEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -65,7 +65,7 @@ public class PedestalEntityGenerator {
             DisplayEntity.ItemDisplayEntity ret = super.create(world, structure, center, relative);
             ret.getComponent(Incantatium.PEDESTAL_STORAGE_COMPONENT_KEY).setStorageSlot(slot);
             ret.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
-            ret.setTransformationMode(ModelTransformationMode.GUI);
+            ret.setItemDisplayContext(ItemDisplayContext.GUI);
             ret.setTransformation(new AffineTransformation(new Vector3f(), new Quaternionf(0,1,0,0), new Vector3f(0.5f,0.5f,0.5f), new Quaternionf()));
             ret.refreshPositionAndAngles(spawnPos,0 ,-90);
             return ret;

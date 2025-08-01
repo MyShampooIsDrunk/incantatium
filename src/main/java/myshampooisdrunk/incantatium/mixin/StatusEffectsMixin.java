@@ -30,7 +30,7 @@ public abstract class StatusEffectsMixin {
 
     @Redirect(method = "<clinit>", at= @At(value = "INVOKE", target = "Lnet/minecraft/entity/effect/StatusEffects;register(Ljava/lang/String;Lnet/minecraft/entity/effect/StatusEffect;)Lnet/minecraft/registry/entry/RegistryEntry;", ordinal = 28))
     private static RegistryEntry<StatusEffect> redirectConduitPower(String id, StatusEffect statusEffect) {
-        System.out.println(id);
+//        System.out.println(id);
         return register(id, statusEffect.addAttributeModifier(EntityAttributes.ATTACK_SPEED, Identifier.ofVanilla("effect.conduit_power"), 0.05F, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
     }
 

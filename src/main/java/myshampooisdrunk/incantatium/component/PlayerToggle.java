@@ -4,6 +4,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 
 public class PlayerToggle implements Toggle{
     private boolean state;
@@ -21,12 +23,12 @@ public class PlayerToggle implements Toggle{
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        state = tag.getBoolean("toggle_state");
+    public void readData(ReadView readView) {
+        state = readView.getBoolean("ToggleState", false);
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        tag.putBoolean("toggle_state", state);
+    public void writeData(WriteView writeView) {
+        writeView.putBoolean("ToggleState",state);
     }
 }

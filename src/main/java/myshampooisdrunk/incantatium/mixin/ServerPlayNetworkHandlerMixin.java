@@ -29,7 +29,6 @@ import java.util.Objects;
 public abstract class ServerPlayNetworkHandlerMixin extends ServerCommonNetworkHandler {
 
     @Shadow public ServerPlayerEntity player;
-    private final ServerPlayNetworkHandler dis = (ServerPlayNetworkHandler)(Object)this;
 
     @Redirect(
             method="tick",

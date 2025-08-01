@@ -15,7 +15,6 @@ import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -114,12 +113,13 @@ public class DivineCrownItem extends AbstractCustomArmorItem{
         addComponent(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
         addComponent(DataComponentTypes.DAMAGE_RESISTANT, new DamageResistantComponent(DamageTypeTags.NO_KNOCKBACK));
         addComponent(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+        addComponent(DataComponentTypes.EQUIPPABLE, EquippableComponent.builder(EquipmentSlot.HEAD).build());
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected, CallbackInfo ci) {
-        if(entity instanceof PlayerEntity p && world instanceof ServerWorld sWorld){
-            if(slot==3 && p.getInventory().getArmorStack(3)==stack){
+    public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, EquipmentSlot slot, CallbackInfo ci) {
+        if(entity instanceof PlayerEntity p && world instanceof ServerWorld sWorld && slot != null){
+            if(slot.isArmorSlot() && slot == EquipmentSlot.HEAD){
                 List<StatusEffectInstance> effects = new ArrayList<>();
                 int demos = sWorld.getPlayers(TargetPredicate.createAttackable()
                         .setPredicate((l,w) -> p.distanceTo(l) <= 50), p, Box.of(p.getPos(), 50,50,50)).size();

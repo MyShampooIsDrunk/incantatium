@@ -4,27 +4,24 @@ import myshampooisdrunk.drunk_server_toolkit.DST;
 import myshampooisdrunk.drunk_server_toolkit.multiblock.registry.MultiblockRegistry;
 import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.multiblock.ShrineMultiblock;
-import myshampooisdrunk.incantatium.multiblock.entity.PedestalEntityGenerator;
 import myshampooisdrunk.incantatium.multiblock.inventory.MultiblockInventory;
 import myshampooisdrunk.incantatium.multiblock.recipe.AbstractMultiblockRecipe;
 import myshampooisdrunk.incantatium.registry.IncantatiumRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.entity.decoration.InteractionEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.particle.TrailParticleEffect;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.Comparator;
 import java.util.List;
 
 import static myshampooisdrunk.incantatium.multiblock.ShrineMultiblock.RT2;
@@ -80,16 +77,16 @@ public class CoreInventoryStorage implements InventoryStorage {
     }
 
     @Override
-    public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
-        this.inventory.readNbt(nbtCompound, wrapperLookup);
-        if(nbtCompound.contains("craftingTicks")) ticks = nbtCompound.getInt("craftingTicks");
+    public void readData(ReadView readView) {
+        this.inventory.readData(readView);
+        ticks = readView.getInt("CraftingTicks", -1);
     }
 
     @Override
-    public void writeToNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
+    public void writeData(WriteView writeView) {
         if(!inventory.isEmpty())
-            nbtCompound.put("Inventory",this.inventory.toNbt(wrapperLookup));
-        nbtCompound.putInt("craftingTicks",ticks);
+            this.inventory.writeData(writeView);
+        writeView.putInt("CraftingTicks",ticks);
     }
 
     @Override

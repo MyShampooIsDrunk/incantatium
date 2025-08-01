@@ -1,9 +1,11 @@
 package myshampooisdrunk.incantatium.mixin;
 
+import myshampooisdrunk.drunk_server_toolkit.util.Util;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -14,12 +16,12 @@ import static myshampooisdrunk.incantatium.util.SoulboundHelper.isSoulbound;
 
 @Mixin(PlayerInventory.class)
 public class PlayerInventoryMixin {
-    @Redirect(method = "dropAll", at = @At(value = "INVOKE", target = "Ljava/util/List;set(ILjava/lang/Object;)Ljava/lang/Object;"))
-    public <E> E setIfSoulbound(List<E> instance, int i, E e){
+    @Redirect(method = "dropAll", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/collection/DefaultedList;set(ILjava/lang/Object;)Ljava/lang/Object;"))
+    public <E> E setIfSoulbound(DefaultedList<E> instance, int i, E e){
         ItemStack stack = (ItemStack) instance.get(i);
 //        System.out.println("stack: " + stack);
         if(isSoulbound(stack)) {
-            return (E)stack;
+            return Util.forceCast(stack);
         }
         instance.set(i,e);
         return e;

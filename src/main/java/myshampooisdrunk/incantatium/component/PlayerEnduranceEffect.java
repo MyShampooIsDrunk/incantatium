@@ -6,6 +6,8 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 
 public class PlayerEnduranceEffect implements EnduranceEffect{
 
@@ -40,12 +42,12 @@ public class PlayerEnduranceEffect implements EnduranceEffect{
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        tick = tag.getInt("endurance_ticks");
+    public void readData(ReadView readView) {
+        tick = readView.getInt("EnduranceTicks", -1);
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        tag.putInt("endurance_ticks",tick);
+    public void writeData(WriteView writeView) {
+        writeView.putInt("EnduranceTicks", tick);
     }
 }

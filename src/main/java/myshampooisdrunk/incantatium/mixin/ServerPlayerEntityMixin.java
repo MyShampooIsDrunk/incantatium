@@ -25,7 +25,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
     @Inject(method="onDeath",at=@At("HEAD"))
     public void updateCache(DamageSource damageSource, CallbackInfo ci){
-        ServerChunkTickManager man = ((ServerChunkTickManagerInterface)dis.getServerWorld().getServer()).getServerChunkTickManager();
+        ServerChunkTickManager man = ((ServerChunkTickManagerInterface)dis.getWorld().getServer()).getServerChunkTickManager();
         for(ServerChunkTickManager.ChunkTickManager chunk : man.getChunks()){
             if(chunk.getPlayerCache().containsKey(this.getUuidAsString())){
                 chunk.untrackPlayer(this);
@@ -46,7 +46,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
         return instance.isInvulnerableTo(world, source);
     }
 
-    private ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
-        super(world, pos, yaw, gameProfile);
+    private ServerPlayerEntityMixin(World world, GameProfile gameProfile) {
+        super(world, gameProfile);
     }
 }

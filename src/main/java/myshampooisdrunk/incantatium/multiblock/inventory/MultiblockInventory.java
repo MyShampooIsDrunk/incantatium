@@ -6,10 +6,11 @@ import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.collection.DefaultedList;
 
 import java.util.ArrayList;
@@ -154,31 +155,27 @@ public class MultiblockInventory implements MultiblockRecipeInput {
         return this.heldStacks.stream().filter(stack -> !stack.isEmpty()).toList().toString();
     }
 
-    public NbtList toNbt(RegistryWrapper.WrapperLookup wrapperLookup) {
-        NbtList list = new NbtList();
+    public WriteView.ListView writeData(WriteView writeView) {
+        WriteView.ListView list = writeView.getList("Inventory");
         for (int i = 0; i < heldStacks.size(); i++) {
-            NbtCompound c = new NbtCompound();
-            c.putByte("Slot", (byte)i);
+            WriteView slot = list.add();
+            slot.putByte("Slot", (byte) i);
             Singleton e = heldStacks.get(i);
-            c.putInt("Count", e.count);
+            slot.putInt("Count", e.count);
             if(!e.isEmpty()) {
-                e.toNbt(c, wrapperLookup);
-                list.add(c);
-            } //else list.add();
+                e.writeData(writeView);
+            }
         }
-//        NbtCompound ret = new NbtCompound();
-//        ret.put("Inventory", list);
         return list;
     }
 
-    public void readNbt(NbtCompound compound, RegistryWrapper.WrapperLookup wrapperLookup) {
+    public void readData(ReadView readView) {
         this.heldStacks.clear();
-        NbtList list = compound.getList("Inventory", NbtElement.COMPOUND_TYPE);
-        for (int i = 0; i < list.size(); i++) {
-            NbtCompound nbtCompound = list.getCompound(i);
-            int j = nbtCompound.getByte("Slot") & 255;
+        ReadView.ListReadView list = readView.getListReadView("Inventory");
+        for (ReadView view : list) {
+            int j = readView.getByte("Slot", (byte) -1) & 255;
             if (j < this.heldStacks.size()) {
-                this.heldStacks.set(j, Singleton.fromNbt(nbtCompound, wrapperLookup));
+                this.heldStacks.set(j, Singleton.parseData(readView));
             }
         }
     }
@@ -196,7 +193,9 @@ public class MultiblockInventory implements MultiblockRecipeInput {
         public abstract boolean isEmpty();
         public abstract Entry withCount(int count);
         public abstract Entry clone();
-        public abstract void toNbt(NbtCompound compound, RegistryWrapper.WrapperLookup registries);
+        public abstract void writeData(WriteView writeView);
+        public abstract Entry readData(ReadView readView);
+//        public abstract void toNbt(NbtCompound compound, RegistryWrapper.WrapperLookup registries);
     }
 
     public static class Stack extends Entry {
@@ -234,9 +233,15 @@ public class MultiblockInventory implements MultiblockRecipeInput {
             return new Stack(stack);
         }
 
-        public void toNbt(NbtCompound compound, RegistryWrapper.WrapperLookup wrapperLookup) {
+        @Override
+        public void writeData(WriteView writeView) {
             if(this.isEmpty()) return;
-            compound.put("Item",stack.toNbt(wrapperLookup));
+            writeView.put("Item", ItemStack.CODEC, stack);
+        }
+
+        @Override
+        public Stack readData(ReadView readView) {
+            return new Stack(readView.read("Item",ItemStack.CODEC).orElse(ItemStack.EMPTY));
         }
     }
 
@@ -290,11 +295,19 @@ public class MultiblockInventory implements MultiblockRecipeInput {
             return "Item: " + this.stack.getItem() + " | count: " + this.count;
         }
 
-        public void toNbt(NbtCompound compound, RegistryWrapper.WrapperLookup wrapperLookup) {
+        @Override
+        public void writeData(WriteView writeView) {
             if(this.isEmpty()) return;
-            compound.putInt("Count", count);
-            compound.putInt("MaxCount", maxCount);
-            compound.put("Item",stack.toNbt(wrapperLookup));
+            writeView.putInt("Count", count);
+            writeView.putInt("MaxCount", maxCount);
+            writeView.put("Item", ItemStack.CODEC, stack);
+        }
+
+        @Override
+        public Capped readData(ReadView readView) {
+            return new Capped(readView.read("Item",ItemStack.CODEC).orElse(ItemStack.EMPTY),
+                    readView.getInt("Count",0),
+                    readView.getInt("MaxCount",0));
         }
     }
 
@@ -339,24 +352,23 @@ public class MultiblockInventory implements MultiblockRecipeInput {
             return "Item: " + this.stack.getItem() + " | count: " + this.count + " | components: " + stack.getComponentChanges();
         }
 
-        public void toNbt(NbtCompound compound, RegistryWrapper.WrapperLookup wrapperLookup) {
-            if(this.isEmpty()) return;
-            compound.putInt("Count", count);
-            compound.put("Item",stack.toNbt(wrapperLookup));
+        public static Singleton parseData(ReadView readView) {
+            return EMPTY.readData(readView);
         }
 
-        public static Singleton fromNbt(NbtCompound compound, RegistryWrapper.WrapperLookup registries) {
-            if(!compound.contains("Count")) return EMPTY;
-
-            ItemStack stack = ItemStack.EMPTY;
-            if(compound.contains("Item")) {
-                NbtElement e = compound.get("Item");
-                stack = ItemStack.fromNbt(registries, e).orElse(ItemStack.EMPTY);
-            }
-
-            int count = compound.getInt("Count");
+        public Singleton readData(ReadView readView) {
+            int count = readView.getInt("Count", 0);
+            if(count == 0) return EMPTY;
+            ItemStack stack = readView.read("Item",ItemStack.CODEC).orElse(ItemStack.EMPTY);
             if(stack.isEmpty() || count <= 0) return EMPTY;
             return new Singleton(stack,count);
+        }
+
+        @Override
+        public void writeData(WriteView writeView) {
+            if(this.isEmpty()) return;
+            writeView.putInt("Count", count);
+            writeView.put("Item",ItemStack.CODEC, stack);
         }
     }
 }

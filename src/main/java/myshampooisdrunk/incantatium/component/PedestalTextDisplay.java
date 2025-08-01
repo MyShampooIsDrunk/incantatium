@@ -7,6 +7,8 @@ import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
@@ -67,14 +69,12 @@ public class PedestalTextDisplay implements PedestalDisplay {
     }
 
     @Override
-    public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
-        if(nbtCompound.contains("Slot"))
-            this.slot = nbtCompound.getInt("Slot");
+    public void readData(ReadView readView) {
+        this.slot = readView.getInt("Slot",-1);
     }
 
     @Override
-    public void writeToNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
-        if(slot != -1)
-            nbtCompound.putInt("Slot", slot);
+    public void writeData(WriteView writeView) {
+        if(slot != -1) writeView.putInt("Slot",slot);
     }
 }

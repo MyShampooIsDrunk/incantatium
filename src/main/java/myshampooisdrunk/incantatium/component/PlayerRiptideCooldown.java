@@ -5,6 +5,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -76,17 +78,17 @@ public class PlayerRiptideCooldown implements RiptideCooldown{
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        lastUse = tag.getInt("lastUse");
-        charges = tag.getInt("riptideCharges");
-        cooldown = tag.getInt("riptideCooldown");
+    public void readData(ReadView readView) {
+        lastUse = readView.getInt("LastUse", 0);
+        charges = readView.getInt("RiptideCharges", 0);
+        cooldown = readView.getInt("RiptideCooldown", 0);
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        tag.putInt("lastUse", lastUse);
-        tag.putInt("riptideCharges", charges);
-        tag.putInt("riptideCooldown", cooldown);
+    public void writeData(WriteView writeView) {
+        writeView.putInt("LastUse", lastUse);
+        writeView.putInt("RiptideCharges", charges);
+        writeView.putInt("RiptideCooldown", cooldown);
     }
 
     @Override

@@ -6,6 +6,15 @@ plugins {
 
 loom {
 	accessWidenerPath = file("src/main/resources/incantatium.accessWidener")
+	splitEnvironmentSourceSets()
+
+	mods {
+		"modid" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
+
 }
 
 version = project.mod_version

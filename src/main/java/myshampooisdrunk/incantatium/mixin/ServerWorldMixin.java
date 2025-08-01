@@ -31,9 +31,6 @@ import java.util.function.Supplier;
 
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin extends World {
-
-    private final ServerWorld dis = (ServerWorld)(Object)this;
-
     @Inject(method="tickEntity", at=@At("HEAD"), cancellable = true)
     public void shouldActuallyTickEntities(Entity entity, CallbackInfo ci) {
         if(!entity.getWorld().isClient()){
@@ -72,19 +69,19 @@ public abstract class ServerWorldMixin extends World {
 
     @Inject(method="tickBlock", at=@At("HEAD"), cancellable = true)
     public void shouldActuallyTickBlocks(BlockPos pos, Block block, CallbackInfo ci) {
-        if(!TickHelper.shouldTick(dis.getServer(), this.getWorldChunk(pos))) ci.cancel();
+        if(!TickHelper.shouldTick(getServer(), this.getWorldChunk(pos))) ci.cancel();
     }
 
     @Inject(method="tickFluid", at=@At("HEAD"), cancellable = true)
     public void shouldActuallyTickFluids(BlockPos pos, Fluid fluid, CallbackInfo ci) {
-        if(!TickHelper.shouldTick(dis.getServer(), this.getWorldChunk(pos))) ci.cancel();
+        if(!TickHelper.shouldTick(getServer(), this.getWorldChunk(pos))) ci.cancel();
     }
 
     @Redirect(method="tick",at=@At(value="INVOKE",target="Lnet/minecraft/server/world/ServerWorld;tickBlockEntities()V"))
     public void shouldActuallyTickBlockEntities(ServerWorld instance){
         List<BlockEntityTickInvoker> shouldRemove = new ArrayList<>();
         for(BlockEntityTickInvoker inv: ((PendingTickersAccessor)this).getPendingBlockEntityTickers()){
-            if(!TickHelper.shouldTick(dis.getServer(), this.getWorldChunk(inv.getPos())))
+            if(!TickHelper.shouldTick(this.getServer(), this.getWorldChunk(inv.getPos())))
                 shouldRemove.add(inv);
         }//inv.getPos()
         ((PendingTickersAccessor)this).getPendingBlockEntityTickers().removeAll(shouldRemove);

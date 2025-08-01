@@ -5,6 +5,7 @@ import myshampooisdrunk.incantatium.component.OrnamentAbilities;
 import myshampooisdrunk.incantatium.component.PlayerOrnamentAbilities;
 import myshampooisdrunk.incantatium.component.Toggle;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -14,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.TeamS2CPacket;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
@@ -35,7 +37,7 @@ public class RevelationOrnamentItem extends AbstractOrnamentItem{
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected, CallbackInfo ci) {
+    public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, EquipmentSlot slot, CallbackInfo ci) {
         boolean bl = false;
         if(entity instanceof PlayerEntity p ) {
             OrnamentAbilities abilities = p.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY);
@@ -67,7 +69,7 @@ public class RevelationOrnamentItem extends AbstractOrnamentItem{
             if(packet != null) sp.networkHandler.sendPacket(packet);
         }
 
-        super.inventoryTick(stack, world, entity, slot, selected, ci);
+        super.inventoryTick(stack, world, entity, slot, ci);
     }
 
     @Override

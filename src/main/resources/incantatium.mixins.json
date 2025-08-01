@@ -27,6 +27,5 @@
     "defaultRequire": 1
   },
   "client": [
-    "ClientPlayNetworkHandlerMixin"
   ]
 }

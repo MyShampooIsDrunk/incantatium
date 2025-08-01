@@ -7,7 +7,6 @@ import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.EquippableComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.equipment.EquipmentType;
@@ -27,14 +26,14 @@ public abstract class AbstractCustomArmorItem extends AbstractCustomItem {
 
     public AbstractCustomArmorItem(Item item, Identifier identifier, EquipmentType type) {
         super(item, identifier);
-        this.component=EquippableComponent.builder(type.getEquipmentSlot()).build();
+        this.component = EquippableComponent.builder(type.getEquipmentSlot()).build();
         addComponent(DataComponentTypes.EQUIPPABLE, component);
 
     }
 
     public AbstractCustomArmorItem(Item item, Identifier identifier, @Nullable String itemName, EquipmentType type) {
         super(item, identifier, itemName);
-        this.component=EquippableComponent.builder(type.getEquipmentSlot()).build();
+        this.component = EquippableComponent.builder(type.getEquipmentSlot()).build();
         addComponent(DataComponentTypes.EQUIPPABLE, component);
     }
 

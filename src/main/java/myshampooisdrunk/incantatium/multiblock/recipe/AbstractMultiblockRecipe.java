@@ -124,7 +124,7 @@ public abstract class AbstractMultiblockRecipe implements Recipe<MultiblockRecip
             int count = stack.getCount();
             if(stack.contains(DataComponentTypes.CUSTOM_DATA)) {
                 NbtCompound c = Objects.requireNonNull(stack.get(DataComponentTypes.CUSTOM_DATA)).copyNbt();
-                if(c.contains("singletonItemCount")) count = c.getInt("singletonItemCount");
+                if(c.contains("singletonItemCount")) count = c.getInt("singletonItemCount").orElse(0);
             }
             return test(MultiblockInventory.Singleton.create(stack, count));
         }
