@@ -4,12 +4,14 @@ import myshampooisdrunk.drunk_server_toolkit.item.AbstractCustomItem;
 import myshampooisdrunk.drunk_server_toolkit.item.potion.CustomPotion;
 import myshampooisdrunk.drunk_server_toolkit.register.CustomItemRegistry;
 import myshampooisdrunk.incantatium.Incantatium;
-import myshampooisdrunk.incantatium.items.DivineCrownItem;
-import myshampooisdrunk.incantatium.items.SichotianAppleItem;
-import myshampooisdrunk.incantatium.items.ThunderstormItem;
-import myshampooisdrunk.incantatium.items.TimeStopItem;
+import myshampooisdrunk.incantatium.items.*;
 import myshampooisdrunk.incantatium.items.ornaments.*;
 import myshampooisdrunk.incantatium.multiblock.IncantatiumMultiblockRegistry;
+import myshampooisdrunk.incantatium.multiblock.entity.PedestalEntityGenerator;
+import myshampooisdrunk.incantatium.multiblock.recipe.AbstractMultiblockRecipe;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentType;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -18,8 +20,9 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
-import java.util.List;
-import java.util.Map;
+import net.minecraft.util.Identifier;
+
+import java.util.*;
 
 public class IncantatiumRegistry {
 
@@ -27,6 +30,8 @@ public class IncantatiumRegistry {
     public static final AbstractCustomItem TIME_STOP_SWORD = CustomItemRegistry.registerItem(new TimeStopItem());
     public static final ThunderstormItem THUNDERSTORM_ITEM = (ThunderstormItem)CustomItemRegistry.registerWithRecipe(new ThunderstormItem());
     public static final SichotianAppleItem SICHOTIAN_APPLE = (SichotianAppleItem)CustomItemRegistry.registerWithRecipe(new SichotianAppleItem());
+
+    public static final AbstractCustomItem SHRINE_DISPLAY_ITEM = CustomItemRegistry.registerItem(new ShrineDisplayItem());
 
     public static final AbstractCustomItem REVELATION_ORNAMENT = CustomItemRegistry.registerItem(new RevelationOrnamentItem());
     public static final AbstractCustomItem ENDURANCE_ORNAMENT = CustomItemRegistry.registerItem(new EnduranceOrnamentItem());
@@ -45,6 +50,8 @@ public class IncantatiumRegistry {
             .maxPotency(1,Ingredient.ofItems(Items.GLOWSTONE_DUST))
             .build(Incantatium.id("broken_armor"));
 
+    public static final Map<Identifier, AbstractMultiblockRecipe> MULTIBLOCK_RECIPES = new HashMap<>();
+
     public static void init(){
         IncantatiumMultiblockRegistry.init();
         CustomItemRegistry.registerRecipe(
@@ -61,6 +68,7 @@ public class IncantatiumRegistry {
                 Ingredient.ofItems(Items.NETHERITE_SCRAP, Items.ANCIENT_DEBRIS));
     }
 
+
     public static int rgbToInt(int[] rgb){
         int ret = 0;
         for(int c :rgb) {
@@ -68,4 +76,19 @@ public class IncantatiumRegistry {
         }
         return ret;
     }
+
+    public static ComponentMap getCustomData(AbstractCustomItem item) {
+        return ComponentMap.builder().add(DataComponentTypes.CUSTOM_DATA,item.create().get(DataComponentTypes.CUSTOM_DATA)).build();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static ComponentMap getCustomData(AbstractCustomItem item, ComponentType<?>... types) {
+        ItemStack stack = item.create();
+        ComponentMap.Builder builder = ComponentMap.builder();
+        for (ComponentType<?> type : types) {
+            builder.add((ComponentType<Object>) type, stack.get(type));
+        }
+        return builder.build();
+    }
+
 }

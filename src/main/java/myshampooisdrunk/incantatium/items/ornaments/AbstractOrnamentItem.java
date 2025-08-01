@@ -25,13 +25,11 @@ import java.util.Optional;
 
 public abstract class AbstractOrnamentItem extends AbstractCustomItem {
     private final int cooldown; //in ticks
-    private final UseCooldownComponent cooldownComponent;
 
     public AbstractOrnamentItem(Identifier identifier, @Nullable String itemName, int cooldown) {
         super(Items.FERMENTED_SPIDER_EYE, identifier, itemName);//Incantatium.getModel(identifier)
         this.cooldown = Incantatium.DEV_MODE ? 600 : cooldown;
-        this.cooldownComponent = new UseCooldownComponent(cooldown/20f, Optional.of(Incantatium.id("ornament_cooldown")));
-        addComponent(DataComponentTypes.USE_COOLDOWN, cooldownComponent);
+        addComponent(DataComponentTypes.USE_COOLDOWN, new UseCooldownComponent(cooldown / 20f, Optional.of(Incantatium.id("ornament_cooldown"))));
     }
 
     public void cooldownItems(PlayerEntity p){
@@ -54,32 +52,22 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected, CallbackInfo ci) {
-//        boolean modified = false;
         if(entity instanceof PlayerEntity p && !world.isClient()){
             AttributeModifiersComponent attrMods = AttributeModifiersComponent.DEFAULT;
             OrnamentAbilities abilities = p.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY);
             if(abilities.isActive(identifier)) {
-//                System.out.println("ability is active");
                 if(!Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
-//                    System.out.println("skiby dee");
                     stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
-//                    modified = true;
                 }
                 attrMods = getAttributeModifiers();
                 if(stack == p.getOffHandStack()) getActiveEffects(stack, world, p);
             }
             else if(!abilities.isActive(identifier) && Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
                 stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, false);
-//                modified = true;
             }
             if(!Objects.equals(stack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS), attrMods)){
                 stack.set(DataComponentTypes.ATTRIBUTE_MODIFIERS, attrMods);
-//                modified = true;
             }
-//            if(modified) {
-//                p.getInventory().setStack(slot, stack);
-////                System.out.println("modified shit");
-//            }
         }
     }
 

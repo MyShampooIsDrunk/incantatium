@@ -3,23 +3,27 @@ package myshampooisdrunk.incantatium.component;
 import myshampooisdrunk.incantatium.multiblock.inventory.MultiblockInventory;
 import net.minecraft.item.ItemStack;
 import org.ladysnake.cca.api.v3.component.Component;
+import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-public interface InventoryStorage extends Component {
+public interface InventoryStorage extends ServerTickingComponent {
 
     MultiblockInventory getInventory();
 
-    default MultiblockInventory.Entry getStack(int slot) {
+    default MultiblockInventory.Singleton getStack(int slot) {
         return getInventory().get(slot);
     }
 
-    default void setSlot(MultiblockInventory.Entry entry, int slot) {
-        getInventory().set(entry, slot);
+    default void setSlot(MultiblockInventory.Singleton singleton, int slot) {
+        getInventory().set(singleton, slot);
     }
+
+    void update();
+
+    void startTimer();
+
+    boolean isTicking();
+
+    void cancel();
 
     default boolean tryAddStack(int slot, ItemStack stack) {
         assert 0 <= slot && slot < 8;

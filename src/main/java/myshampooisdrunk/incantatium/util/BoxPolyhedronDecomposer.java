@@ -178,9 +178,9 @@ public class BoxPolyhedronDecomposer {
             if(!rem.isEmpty()) working.removeAll(rem);
             if(decomposed > voxels.size()) break;
         }
-        ret.forEach((v,d) -> {
-            System.out.println("polyhedron with corner " + v + " and length " + d);
-        });
+//        ret.forEach((v,d) -> {
+//            System.out.println("polyhedron with corner " + v + " and length " + d);
+//        });
 
         return ret;
     }

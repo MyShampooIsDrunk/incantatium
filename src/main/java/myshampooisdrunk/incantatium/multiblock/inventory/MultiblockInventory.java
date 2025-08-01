@@ -1,27 +1,46 @@
 package myshampooisdrunk.incantatium.multiblock.inventory;
 
-import com.ibm.icu.util.ICUCloneNotSupportedException;
+import myshampooisdrunk.incantatium.multiblock.recipe.MultiblockRecipeInput;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class MultiblockInventory implements Inventory {
-    public static final Entry EMPTY = new Entry(ItemStack.EMPTY, 0);
+public class MultiblockInventory implements MultiblockRecipeInput {
+    public static final Singleton EMPTY = new Singleton(ItemStack.EMPTY, 0);
     private final int size;
-    private final DefaultedList<Entry> heldStacks;
+    private final DefaultedList<Singleton> heldStacks;
 
     public MultiblockInventory(int size) {
         this.size = size;
         heldStacks = DefaultedList.ofSize(size, EMPTY);
+    }
+
+    @Override
+    public Entry getEntryInSlot(int slot) {
+        return get(slot);
+    }
+
+    @Override
+    public ItemStack getStackInSlot(int slot) {
+        if(slot >= 0 && slot < this.heldStacks.size()) return ItemStack.EMPTY;
+        Entry e = get(slot);
+        ItemStack temp = e.stack().copyWithCount(1);
+        NbtCompound custom = new NbtCompound();
+        if(temp.contains(DataComponentTypes.CUSTOM_DATA)) custom = Objects.requireNonNull(temp.get(DataComponentTypes.CUSTOM_DATA)).copyNbt();
+        custom.putInt("singletonItemCount", e.count());
+        temp.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(custom));
+        return temp;
     }
 
     @Override
@@ -31,33 +50,42 @@ public class MultiblockInventory implements Inventory {
 
     @Override
     public boolean isEmpty() {
-        return heldStacks.isEmpty();
+        for (Singleton e : this.heldStacks) {
+            if (!e.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    public Entry get(int slot) {
+    public Singleton get(int slot) {
         return slot >= 0 && slot < this.heldStacks.size() ? this.heldStacks.get(slot) : EMPTY;
     }
 
     @Override
     public ItemStack getStack(int slot) {
-        return slot >= 0 && slot < this.heldStacks.size() ? this.heldStacks.get(slot).stack : ItemStack.EMPTY;
+        return getStackInSlot(slot);
     }
 
-    public void set(Entry entry, int slot) {
-        this.heldStacks.set(slot, entry);
+    public void set(Singleton singleton, int slot) {
+        this.heldStacks.set(slot, singleton);
     }
 
-    public Entry getStackQuantity(int slot) {
+    public Singleton getStackQuantity(int slot) {
         return slot >= 0 && slot < this.heldStacks.size() ? this.heldStacks.get(slot) : EMPTY;
     }
 
     @Override
     public ItemStack removeStack(int slot, int amount) {
+//        System.out.println("I am " + this + " and im trying to remove " + amount);
         if(slot < 0 || slot >= this.heldStacks.size()) return ItemStack.EMPTY;
-        Entry e = this.heldStacks.get(slot);
+        Singleton e = this.heldStacks.get(slot);
         if(amount <= 0 || e.stack == null || e.stack.isEmpty() || amount > e.stack.getMaxCount()) return ItemStack.EMPTY;
         amount = Math.min(amount, e.count);
-        if (e.count == amount) return heldStacks.set(slot, EMPTY).stack();
+//        if (e.count == amount) {
+//            heldStacks.set(slot, EMPTY);
+//            return e.stack.copyWithCount(e.count);
+//        }
         heldStacks.set(slot, e.withCount(e.count - amount));
         return e.stack.copyWithCount(amount);
     }
@@ -65,7 +93,7 @@ public class MultiblockInventory implements Inventory {
     @Override
     public ItemStack removeStack(int slot) {
         if(slot < 0 || slot >= this.heldStacks.size()) return ItemStack.EMPTY;
-        Entry e = this.heldStacks.get(slot);
+        Singleton e = this.heldStacks.get(slot);
         if(e.stack == null || e.stack.isEmpty()) return ItemStack.EMPTY;
         return removeStack(slot, e.stack.getMaxCount());
     }
@@ -73,7 +101,7 @@ public class MultiblockInventory implements Inventory {
     @Override
     public void setStack(int slot, ItemStack stack) {
         if(slot < 0 || slot >= this.heldStacks.size()) return;
-        this.heldStacks.set(slot, new Entry(stack, stack.getCount()));
+        this.heldStacks.set(slot, new Singleton(stack, stack.getCount()));
     }
 
     public List<ItemStack> toStacks() {
@@ -94,14 +122,15 @@ public class MultiblockInventory implements Inventory {
     }
 
     public boolean addStack(int slot, ItemStack stack) {
+//        System.out.println("tried adding stack: " + slot + ", " + stack);
         if(slot < 0 || slot >= this.heldStacks.size() || stack.isEmpty()) return false;
-        Entry e;
+        Singleton e;
         if((e = this.heldStacks.get(slot)).isEmpty()) {
-            this.heldStacks.set(slot, new Entry(stack));
+            this.heldStacks.set(slot, new Singleton(stack));
             return true;
         }
         if(ItemStack.areItemsAndComponentsEqual(e.stack, stack)) {
-            this.heldStacks.set(slot, new Entry(e.stack, e.count + stack.getCount()));
+            this.heldStacks.set(slot, new Singleton(e.stack, e.count + stack.getCount()));
             return true;
         }
         return false;
@@ -130,9 +159,12 @@ public class MultiblockInventory implements Inventory {
         for (int i = 0; i < heldStacks.size(); i++) {
             NbtCompound c = new NbtCompound();
             c.putByte("Slot", (byte)i);
-            Entry e = heldStacks.get(i);
+            Singleton e = heldStacks.get(i);
             c.putInt("Count", e.count);
-            list.add(e.stack.copyWithCount(1).toNbt(wrapperLookup, c));
+            if(!e.isEmpty()) {
+                e.toNbt(c, wrapperLookup);
+                list.add(c);
+            } //else list.add();
         }
 //        NbtCompound ret = new NbtCompound();
 //        ret.put("Inventory", list);
@@ -145,25 +177,137 @@ public class MultiblockInventory implements Inventory {
         for (int i = 0; i < list.size(); i++) {
             NbtCompound nbtCompound = list.getCompound(i);
             int j = nbtCompound.getByte("Slot") & 255;
-            ItemStack itemStack = ItemStack.fromNbt(wrapperLookup, nbtCompound).orElse(ItemStack.EMPTY);
             if (j < this.heldStacks.size()) {
-                int count = nbtCompound.getInt("Count");
-                Entry e = new Entry(itemStack, count);
-                this.heldStacks.set(j, e);
+                this.heldStacks.set(j, Singleton.fromNbt(nbtCompound, wrapperLookup));
             }
         }
     }
 
-    public static class Entry implements Cloneable {
+    @Override
+    public void provideRecipeInputs(RecipeFinder finder) {
+        for (int i = 0; i < size; i++) {
+            finder.addInput(getStackInSlot(i));
+        }
+    }
+
+    public static abstract class Entry implements Cloneable {
+        public abstract int count();
+        public abstract ItemStack stack();
+        public abstract boolean isEmpty();
+        public abstract Entry withCount(int count);
+        public abstract Entry clone();
+        public abstract void toNbt(NbtCompound compound, RegistryWrapper.WrapperLookup registries);
+    }
+
+    public static class Stack extends Entry {
+        private final ItemStack stack;
+        private Stack(ItemStack stack) {
+            this.stack = stack;
+        }
+
+        @Override
+        public int count() {
+            return stack.getCount();
+        }
+
+        @Override
+        public ItemStack stack() {
+            return stack;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return stack.isEmpty();
+        }
+
+        @Override
+        public Stack withCount(int count) {
+            return new Stack(stack.copyWithCount(count));
+        }
+
+        @Override
+        public Stack clone() {
+            return new Stack(stack);
+        }
+
+        public static Stack create(ItemStack stack) {
+            return new Stack(stack);
+        }
+
+        public void toNbt(NbtCompound compound, RegistryWrapper.WrapperLookup wrapperLookup) {
+            if(this.isEmpty()) return;
+            compound.put("Item",stack.toNbt(wrapperLookup));
+        }
+    }
+
+    public static class Capped extends Entry {
+        public static final Capped EMPTY = new Capped(ItemStack.EMPTY,0,0);
+        private final ItemStack stack;
+        private final int count;
+        private final int maxCount;
+
+        private Capped(ItemStack stack, int count, int maxCount) {
+            this.stack = stack;
+            this.count = count;
+            this.maxCount = maxCount;
+        }
+
+        private Capped(ItemStack stack, int maxCount) {
+            this(stack, stack.getCount(), maxCount);
+        }
+
+        private Capped(ItemStack stack) {
+            this(stack, stack.getCount(), stack.getMaxCount());
+        }
+
+        public int count(){return count;}
+
+        public int getMaxCount(){return maxCount;}
+
+        public ItemStack stack(){return stack;}
+
+        public boolean isEmpty() {
+            return count == 0 || stack == null || stack.isEmpty();
+        }
+
+        public Capped withCount(int count) {
+            if(count == 0) return EMPTY;
+            return new Capped(stack, count);
+        }
+
+        public Capped clone() {
+            return new Capped(stack, count, maxCount);
+        }
+
+        public static Capped create(ItemStack stack, int count, int maxCount) {
+            if(stack.isEmpty() || count <= 0) return EMPTY;
+            else return new Capped(stack, count, maxCount);
+        }
+
+        @Override
+        public String toString() {
+            if(this.isEmpty()) return "EMPTY";
+            return "Item: " + this.stack.getItem() + " | count: " + this.count;
+        }
+
+        public void toNbt(NbtCompound compound, RegistryWrapper.WrapperLookup wrapperLookup) {
+            if(this.isEmpty()) return;
+            compound.putInt("Count", count);
+            compound.putInt("MaxCount", maxCount);
+            compound.put("Item",stack.toNbt(wrapperLookup));
+        }
+    }
+
+    public static class Singleton extends Entry {
         private final ItemStack stack;
         private final int count;
 
-        private Entry(ItemStack stack, int count) {
+        private Singleton(ItemStack stack, int count) {
             this.stack = stack;
             this.count = count;
         }
 
-        private Entry(ItemStack stack) {
+        private Singleton(ItemStack stack) {
             this(stack, stack.getCount());
         }
 
@@ -175,27 +319,44 @@ public class MultiblockInventory implements Inventory {
             return count == 0 || stack == null || stack.isEmpty();
         }
 
-        public Entry withCount(int count) {
-            return new Entry(stack, count);
+        public Singleton withCount(int count) {
+            if(count == 0) return EMPTY;
+            return new Singleton(stack, count);
         }
 
-        public Entry clone() {
-            Entry c;
-            try {
-                c = (Entry)super.clone();
-            } catch (CloneNotSupportedException e) {
-                // Should never happen.
-                throw new ICUCloneNotSupportedException(e);
-            }
-            return new Entry(stack, count);
+        public Singleton clone() {
+            return new Singleton(stack, count);
         }
 
-        public static Entry fromNbt(NbtCompound compound, RegistryWrapper.WrapperLookup registries) {
+        public static Singleton create(ItemStack stack, int count) {
+            if(stack.isEmpty() || count <= 0) return EMPTY;
+            else return new Singleton(stack, count);
+        }
+
+        @Override
+        public String toString() {
+            if(this.isEmpty()) return "EMPTY";
+            return "Item: " + this.stack.getItem() + " | count: " + this.count + " | components: " + stack.getComponentChanges();
+        }
+
+        public void toNbt(NbtCompound compound, RegistryWrapper.WrapperLookup wrapperLookup) {
+            if(this.isEmpty()) return;
+            compound.putInt("Count", count);
+            compound.put("Item",stack.toNbt(wrapperLookup));
+        }
+
+        public static Singleton fromNbt(NbtCompound compound, RegistryWrapper.WrapperLookup registries) {
             if(!compound.contains("Count")) return EMPTY;
-            ItemStack stack = ItemStack.fromNbt(registries, compound).orElse(ItemStack.EMPTY);
+
+            ItemStack stack = ItemStack.EMPTY;
+            if(compound.contains("Item")) {
+                NbtElement e = compound.get("Item");
+                stack = ItemStack.fromNbt(registries, e).orElse(ItemStack.EMPTY);
+            }
+
             int count = compound.getInt("Count");
             if(stack.isEmpty() || count <= 0) return EMPTY;
-            return new Entry(stack,count);
+            return new Singleton(stack,count);
         }
     }
 }

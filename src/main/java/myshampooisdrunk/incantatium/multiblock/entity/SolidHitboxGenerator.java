@@ -25,7 +25,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.*;
 

@@ -4,10 +4,8 @@ import myshampooisdrunk.drunk_server_toolkit.DST;
 import myshampooisdrunk.drunk_server_toolkit.component.MultiblockData;
 import myshampooisdrunk.drunk_server_toolkit.multiblock.entity.AbstractMultiblockStructureEntity;
 import myshampooisdrunk.drunk_server_toolkit.multiblock.registry.MultiblockRegistry;
-import myshampooisdrunk.drunk_server_toolkit.multiblock.structure.MultiblockStructure;
 import myshampooisdrunk.incantatium.Incantatium;
-import myshampooisdrunk.incantatium.multiblock.RitualMultiblock;
-import myshampooisdrunk.incantatium.multiblock.entity.RitualCoreEntity;
+import myshampooisdrunk.incantatium.multiblock.ShrineMultiblock;
 import myshampooisdrunk.incantatium.multiblock.inventory.MultiblockInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.DisplayEntity;
@@ -18,7 +16,7 @@ import net.minecraft.server.world.ServerWorld;
 public class PedestalInventoryStorage implements InventorySlotStorage {
     private int slot;
     private boolean dirty;
-    private MultiblockInventory.Entry entry = MultiblockInventory.EMPTY;
+    private MultiblockInventory.Singleton singleton = MultiblockInventory.EMPTY;
     private final DisplayEntity.ItemDisplayEntity display;
     public PedestalInventoryStorage(DisplayEntity.ItemDisplayEntity display) {
         this.slot = -1;
@@ -33,24 +31,23 @@ public class PedestalInventoryStorage implements InventorySlotStorage {
 
     @Override
     public void update() {
+//        System.out.println("UPDATE ALERT!!!");
         if(dirty && slot != -1) {
-            display.setItemStack(entry.stack());
+            display.setItemStack(singleton.stack().copyWithCount(1));
             this.markDirty(false);
             String id;
             MultiblockData data = display.getComponent(DST.ENTITY_MULTIBLOCK_DATA_COMPONENT_KEY);
             if((id = data.getEntityId()) != null) {
                 AbstractMultiblockStructureEntity<? extends Entity> structureEntity = MultiblockRegistry.ENTITY_TYPES.get(id).defaultEntity();
-                if ((MultiblockRegistry.STRUCTURES.get(data.getMultiblockID()) instanceof RitualMultiblock r) &&
-                        (display.getWorld() instanceof ServerWorld sw) &&
-                        r.detectBuiltMultiblock(sw, r.centerFromPedestal(display.getPos(), slot))) {
+                if ((MultiblockRegistry.STRUCTURES.get(data.getMultiblockID()) instanceof ShrineMultiblock r) &&
+                        (display.getWorld() instanceof ServerWorld sw)) {
                     DisplayEntity.ItemDisplayEntity core = r.getRitualCoreEntity(sw, r.centerFromPedestal(display.getPos(), slot));
-                    if(core == null) return;
-                    else core.getComponent(Incantatium.INVENTORY_STORAGE_COMPONENT_KEY).setSlot(entry, slot);
+                    if(core != null) {
+                        InventoryStorage storage = core.getComponent(Incantatium.INVENTORY_STORAGE_COMPONENT_KEY);
+                        storage.setSlot(singleton, slot);
+                        storage.update();
+                    }
                 }
-
-
-
-
             }
 //            List<? extends EntityType<?>> types = entityList.keySet().stream()
 //                    .map(AbstractMultiblockStructureEntity::getType).toList();
@@ -85,13 +82,13 @@ public class PedestalInventoryStorage implements InventorySlotStorage {
     }
 
     @Override
-    public MultiblockInventory.Entry getEntry() {
-        return entry;
+    public MultiblockInventory.Singleton getEntry() {
+        return singleton;
     }
 
     @Override
-    public void setEntry(MultiblockInventory.Entry entry) {
-        this.entry = entry;
+    public void setEntry(MultiblockInventory.Singleton singleton) {
+        this.singleton = singleton;
     }
 
     @Override
@@ -99,7 +96,8 @@ public class PedestalInventoryStorage implements InventorySlotStorage {
         if(nbtCompound.contains("Slot")) {
             this.slot = nbtCompound.getInt("Slot");
             this.dirty = nbtCompound.getBoolean("Dirty");
-            this.entry = MultiblockInventory.Entry.fromNbt(nbtCompound, wrapperLookup);
+            this.singleton = MultiblockInventory.Singleton.fromNbt(nbtCompound, wrapperLookup);
+            this.display.setItemStack(singleton.stack());
         }
     }
 
@@ -108,8 +106,7 @@ public class PedestalInventoryStorage implements InventorySlotStorage {
         if(slot != -1) {
             nbtCompound.putInt("Slot", slot);
             nbtCompound.putBoolean("Dirty", dirty);
-            nbtCompound.putInt("Count", this.entry.count());
-            entry.stack().toNbt(wrapperLookup, nbtCompound);
+            singleton.toNbt(nbtCompound, wrapperLookup);
         }
     }
 }

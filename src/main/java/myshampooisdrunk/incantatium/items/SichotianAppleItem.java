@@ -10,6 +10,7 @@ import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.consume.ApplyEffectsConsumeEffect;
 import net.minecraft.recipe.*;
@@ -41,7 +42,14 @@ public class SichotianAppleItem extends AbstractCustomItem implements CustomReci
     public SichotianAppleItem() {
         super(Items.GOLDEN_APPLE, Identifier.of(Incantatium.LOGGER.getName(),"sichotian_apple"), "incantatium.sichotian_apple.name", Incantatium.getModel(Incantatium.id("sichotian_apple")));
 
+        addComponent(DataComponentTypes.FOOD, SICHOTIAN_APPLE_HUNGER);
+        addComponent(DataComponentTypes.CONSUMABLE, SICHOTIAN_APPLE_EFFECTS);
+        addComponent(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+    }
 
+    @Override
+    public ItemStack create() {
+        ItemStack ret = super.create();
         String s = "Sichotian Apple";
         int spaces = 0;
         int[][] nums = new int[][] {
@@ -53,12 +61,10 @@ public class SichotianAppleItem extends AbstractCustomItem implements CustomReci
             if(s.charAt(i) == ' '){
                 name.append(" ");
                 spaces++;
-            }else name.append(Text.literal(String.valueOf(s.charAt(i))).withColor(rgbToInt(nums[i-spaces])));
+            } else name.append(Text.literal(String.valueOf(s.charAt(i))).withColor(rgbToInt(nums[i-spaces])));
         }
-        addComponent(DataComponentTypes.CUSTOM_NAME, name.setStyle(Style.EMPTY.withItalic(false)));
-        addComponent(DataComponentTypes.FOOD, SICHOTIAN_APPLE_HUNGER);
-        addComponent(DataComponentTypes.CONSUMABLE, SICHOTIAN_APPLE_EFFECTS);
-        addComponent(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+        ret.set(DataComponentTypes.ITEM_NAME, name.setStyle(Style.EMPTY.withItalic(false)));
+        return ret;
     }
 
     public CraftingRecipe recipe(){
