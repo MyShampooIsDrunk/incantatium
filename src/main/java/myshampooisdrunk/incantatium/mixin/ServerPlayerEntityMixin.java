@@ -35,18 +35,18 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
         }
     }
 
-    @Inject(method = "attack", at=@At("HEAD"), cancellable = true)
-    public void dontAttackIfEndurance(Entity target, CallbackInfo ci){
-        EnduranceEffect e = this.getComponent(Incantatium.ENDURANCE_COMPONENT_KEY);
-        if(e.getActive()) ci.cancel();
-    }
+//    @Inject(method = "attack", at=@At("HEAD"), cancellable = true)
+//    public void dontAttackIfEndurance(Entity target, CallbackInfo ci){
+//        EnduranceEffect e = this.getComponent(Incantatium.ENDURANCE_COMPONENT_KEY);
+//        if(e.getActive()) ci.cancel();
+//    }
 
-    @Redirect(method="damage",at=@At(value = "INVOKE",target = "Lnet/minecraft/server/network/ServerPlayerEntity;isInvulnerableTo(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/damage/DamageSource;)Z"))
-    public boolean dontDamageIfEndurance(ServerPlayerEntity instance, ServerWorld world, DamageSource source){
-        EnduranceEffect e = instance.getComponent(Incantatium.ENDURANCE_COMPONENT_KEY);
-        if(e.getActive()) return true;
-        return instance.isInvulnerableTo(world, source);
-    }
+//    @Redirect(method="damage",at=@At(value = "INVOKE",target = "Lnet/minecraft/server/network/ServerPlayerEntity;isInvulnerableTo(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/damage/DamageSource;)Z"))
+//    public boolean dontDamageIfEndurance(ServerPlayerEntity instance, ServerWorld world, DamageSource source){
+//        EnduranceEffect e = instance.getComponent(Incantatium.ENDURANCE_COMPONENT_KEY);
+//        if(e.getActive()) return true;
+//        return instance.isInvulnerableTo(world, source);
+//    }
 
     private ServerPlayerEntityMixin(World world, GameProfile gameProfile) {
         super(world, gameProfile);

@@ -6,6 +6,7 @@ import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
@@ -15,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public class ConstitutionOrnamentItem extends AbstractOrnamentItem{
     public ConstitutionOrnamentItem() {
-        super(Incantatium.id("constitution_ornament"), "Constitution", 1);
+        super(Incantatium.id("constitution_ornament"), "Constitution", 6000);
     }
 
     @Override
@@ -23,13 +24,18 @@ public class ConstitutionOrnamentItem extends AbstractOrnamentItem{
     }
 
     @Override
-    public boolean canUse(PlayerEntity p, Hand hand) {
-        return false;
+    public void use(World world, LivingEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+        super.use(world, user, hand, cir);
+        if(user instanceof PlayerEntity p && canUse(p, hand)) {
+            float initialAbsorption = p.getActiveStatusEffects().containsKey(StatusEffects.ABSORPTION) ? p.getAbsorptionAmount() : 0;
+            p.setAbsorptionAmount(initialAbsorption + 20);
+            cooldownItems(p);
+        }
     }
 
     @Override
-    public void use(World world, LivingEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        cir.setReturnValue(ActionResult.PASS);
+    public boolean canUse(PlayerEntity p, Hand hand) {
+        return p.isSneaking() && super.canUse(p, hand);
     }
 
     @Override

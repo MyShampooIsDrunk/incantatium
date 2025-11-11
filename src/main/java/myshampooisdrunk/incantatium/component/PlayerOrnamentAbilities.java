@@ -85,7 +85,7 @@ public class PlayerOrnamentAbilities implements OrnamentAbilities{
         Set<Identifier> keys = new HashSet<>(cooldowns.keySet());
         keys.forEach(i -> {
             if(!i.equals(id)){
-                System.out.println("i: " + i + " id: " + id);
+//                System.out.println("i: " + i + " id: " + id);
                 int j = cooldowns.get(i);
                 if(j == 0) {
                     cooldowns.remove(i);
@@ -100,23 +100,23 @@ public class PlayerOrnamentAbilities implements OrnamentAbilities{
 
     @Override
     public void readData(ReadView readView) {
-        for (ReadView ornament : readView.getListReadView("Ornaments")) {
+        for (ReadView ornament : readView.getListReadView("ornaments")) {
             Identifier id = Identifier.of(ornament.getString("id",""));
             int ticks = ornament.getInt("ticks", 0);
             cooldowns.put(id, ticks);
         }
-        String id = readView.getString("Active", "");
+        String id = readView.getString("active", "");
         if(!id.isEmpty()) active.add(Identifier.of("id"));
     }
 
     @Override
     public void writeData(WriteView writeView) {
-        WriteView.ListView list = writeView.getList("Ornaments");
+        WriteView.ListView list = writeView.getList("ornaments");
         cooldowns.forEach((id, t) -> {
             WriteView o = list.add();
             o.putString("id", id.toString());
             o.putInt("ticks", t);
         });
-        writeView.putString("Active", active.isEmpty() ? "" : active.toArray()[0].toString());
+        writeView.putString("active", active.isEmpty() ? "" : active.toArray()[0].toString());
     }
 }

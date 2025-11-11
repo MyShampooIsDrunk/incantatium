@@ -24,11 +24,11 @@ public class PedestalInteraction implements PedestalDisplay<InteractionEntity, P
 
     @Override
     public void readData(ReadView readView) {
-        this.slot = readView.getInt("Slot",-1);
+        this.slot = readView.getInt("slot",-1);
     }
 
     @Override
     public void writeData(WriteView writeView) {
-        if(slot != -1) writeView.putInt("Slot",slot);
+        if(slot != -1) writeView.putInt("slot",slot);
     }
 }

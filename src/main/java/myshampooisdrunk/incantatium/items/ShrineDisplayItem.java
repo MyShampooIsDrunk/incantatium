@@ -8,6 +8,6 @@ import net.minecraft.util.Identifier;
 
 public class ShrineDisplayItem extends AbstractCustomItem {
     public ShrineDisplayItem() {
-        super(Items.FERMENTED_SPIDER_EYE, Incantatium.id("shrine_display"),null,Incantatium.getModel(Incantatium.id("shrine_model")));
+        super(Items.FERMENTED_SPIDER_EYE, Incantatium.id("shrine_display"),null, Incantatium.getModel(Incantatium.id("shrine_model")));
     }
 }

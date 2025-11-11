@@ -79,6 +79,7 @@ public class Incantatium implements ModInitializer {
 	public static Either<CustomModelDataComponent, Identifier> getModel(String modelId){
 		return Either.left(new CustomModelDataComponent(List.of(), List.of(), List.of(modelId), List.of()));
 	}
+
 	public static Either<CustomModelDataComponent, Identifier> getModel(Identifier path){
 		return Either.right(path);
 	}

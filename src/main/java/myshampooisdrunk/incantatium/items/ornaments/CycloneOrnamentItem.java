@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public class CycloneOrnamentItem extends AbstractOrnamentItem{
     public CycloneOrnamentItem() {
-        super(Incantatium.id("cyclone_ornament"), "Cyclone", 150); // 7.5 sec instead of 5
+        super(Incantatium.id("cyclone_ornament"), "Cyclone", 100); // 5 sec instead of 7.5
     }
 
     @Override
@@ -52,6 +52,5 @@ public class CycloneOrnamentItem extends AbstractOrnamentItem{
 
     @Override
     protected void getActiveEffects(ItemStack stack, World world, PlayerEntity player) {
-
     }
 }

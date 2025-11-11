@@ -24,11 +24,11 @@ public class PlayerToggle implements Toggle{
 
     @Override
     public void readData(ReadView readView) {
-        state = readView.getBoolean("ToggleState", false);
+        state = readView.getBoolean("toggle_state", false);
     }
 
     @Override
     public void writeData(WriteView writeView) {
-        writeView.putBoolean("ToggleState",state);
+        writeView.putBoolean("toggle_state", state);
     }
 }

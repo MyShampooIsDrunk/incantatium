@@ -82,9 +82,9 @@ public class PedestalInventoryStorage implements InventorySlotStorage {
     @Override
     public void readData(ReadView readView) {
         int slot;
-        if((slot = readView.getInt("Slot", -1)) >= 0) {
+        if((slot = readView.getInt("slot", -1)) >= 0) {
             this.slot = slot;
-            this.dirty = readView.getBoolean("Dirty", false);
+            this.dirty = readView.getBoolean("dirty", false);
             this.singleton = MultiblockInventory.Singleton.parseData(readView);
             this.display.setItemStack(singleton.stack());
         }
@@ -93,8 +93,8 @@ public class PedestalInventoryStorage implements InventorySlotStorage {
     @Override
     public void writeData(WriteView writeView) {
         if(slot != -1) {
-            writeView.putInt("Slot", slot);
-            writeView.putBoolean("Dirty", dirty);
+            writeView.putInt("slot", slot);
+            writeView.putBoolean("dirty", dirty);
             singleton.writeData(writeView);
         }
     }

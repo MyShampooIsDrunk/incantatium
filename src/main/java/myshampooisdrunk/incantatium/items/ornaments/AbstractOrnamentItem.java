@@ -30,14 +30,18 @@ import java.util.Optional;
 public abstract class AbstractOrnamentItem extends AbstractCustomItem {
     private final int cooldown; //in ticks
 
-    public AbstractOrnamentItem(Identifier identifier, @Nullable String itemName, int cooldown) {
-        super(Items.FERMENTED_SPIDER_EYE, identifier, itemName);//Incantatium.getModel(identifier)
-        this.cooldown = Incantatium.DEV_MODE ? 600 : cooldown;
-        addComponent(DataComponentTypes.USE_COOLDOWN, new UseCooldownComponent(cooldown / 20f, Optional.of(Incantatium.id("ornament_cooldown"))));
+    public AbstractOrnamentItem(Identifier identifier, String itemName, int cooldown) {
+        this(identifier, itemName, cooldown, true);
+    }
+
+    public AbstractOrnamentItem(Identifier identifier, String itemName, int cooldown, boolean useCooldown) {
+        super(Items.FERMENTED_SPIDER_EYE, identifier, itemName, Incantatium.getModel(identifier));//Incantatium.getModel(identifier)
+        this.cooldown = Math.min(Incantatium.DEV_MODE ? 600 : cooldown, cooldown);
+        if(useCooldown) addComponent(DataComponentTypes.USE_COOLDOWN, new UseCooldownComponent(this.cooldown / 20f, Optional.of(Incantatium.id("ornament_cooldown"))));
     }
 
     public void cooldownItems(PlayerEntity p){
-        p.getItemCooldownManager().set(Incantatium.id("ornament_cooldown"),cooldown);
+        p.getItemCooldownManager().set(Incantatium.id("ornament_cooldown"), cooldown);
     }
 
     public int getCooldown() {
@@ -57,15 +61,12 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
     @Override
     public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, EquipmentSlot slot, CallbackInfo ci) {
         if(entity instanceof ServerPlayerEntity p && !world.isClient()){
-//            StackReference ref = p.getStackReference(slot.getIndex());
-//            boolean bl = ref.get().equals(stack);
             AttributeModifiersComponent attrMods = AttributeModifiersComponent.DEFAULT;
             OrnamentAbilities abilities = p.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY);
             if(abilities.isActive(identifier)) {
                 if(!Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
                     stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
                     p.currentScreenHandler.sendContentUpdates();
-//                    if(bl) ref.set(stack);
                 }
                 attrMods = getAttributeModifiers();
                 if(stack == p.getOffHandStack()) getActiveEffects(stack, world, p);
@@ -73,7 +74,6 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
             else if(!abilities.isActive(identifier) && Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
                 stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, false);
                 p.currentScreenHandler.sendContentUpdates();
-//                if(bl) ref.set(stack);
             }
             if(!Objects.equals(stack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS), attrMods)){
                 stack.set(DataComponentTypes.ATTRIBUTE_MODIFIERS, attrMods);

@@ -79,16 +79,16 @@ public class PlayerRiptideCooldown implements RiptideCooldown{
 
     @Override
     public void readData(ReadView readView) {
-        lastUse = readView.getInt("LastUse", 0);
-        charges = readView.getInt("RiptideCharges", 0);
-        cooldown = readView.getInt("RiptideCooldown", 0);
+        lastUse = readView.getInt("last_use", 0);
+        charges = readView.getInt("riptide_charges", 0);
+        cooldown = readView.getInt("riptide_cooldown", 0);
     }
 
     @Override
     public void writeData(WriteView writeView) {
-        writeView.putInt("LastUse", lastUse);
-        writeView.putInt("RiptideCharges", charges);
-        writeView.putInt("RiptideCooldown", cooldown);
+        writeView.putInt("last_use", lastUse);
+        writeView.putInt("riptide_charges", charges);
+        writeView.putInt("riptide_cooldown", cooldown);
     }
 
     @Override

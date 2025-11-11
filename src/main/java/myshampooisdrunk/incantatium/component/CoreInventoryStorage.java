@@ -79,14 +79,14 @@ public class CoreInventoryStorage implements InventoryStorage {
     @Override
     public void readData(ReadView readView) {
         this.inventory.readData(readView);
-        ticks = readView.getInt("CraftingTicks", -1);
+        ticks = readView.getInt("crafting_ticks", -1);
     }
 
     @Override
     public void writeData(WriteView writeView) {
         if(!inventory.isEmpty())
             this.inventory.writeData(writeView);
-        writeView.putInt("CraftingTicks",ticks);
+        writeView.putInt("crafting_ticks",ticks);
     }
 
     @Override
