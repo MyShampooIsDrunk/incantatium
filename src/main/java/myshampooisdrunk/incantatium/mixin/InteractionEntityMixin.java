@@ -1,9 +1,9 @@
 package myshampooisdrunk.incantatium.mixin;
 
 import myshampooisdrunk.drunk_server_toolkit.DST;
-import myshampooisdrunk.drunk_server_toolkit.component.MultiblockData;
-import myshampooisdrunk.drunk_server_toolkit.multiblock.entity.AbstractMultiblockStructureEntity;
-import myshampooisdrunk.drunk_server_toolkit.multiblock.registry.MultiblockRegistry;
+import myshampooisdrunk.drunk_server_toolkit.multiblock.entity.MultiblockEntity;
+import myshampooisdrunk.drunk_server_toolkit.multiblock.structure.MultiblockStructure;
+import myshampooisdrunk.drunk_server_toolkit.world.MultiblockCacheI;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.decoration.InteractionEntity;
@@ -25,25 +25,17 @@ public abstract class InteractionEntityMixin extends Entity {
 
     @Inject(at=@At("HEAD"), method = "interact", cancellable = true)
     public void injectMultiblockEntityInteract(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir){
-        if(!getWorld().isClient()){
-            String id;
-            MultiblockData data = this.getComponent(DST.ENTITY_MULTIBLOCK_DATA_COMPONENT_KEY);
-            if((id = data.getEntityId()) != null) {
-                AbstractMultiblockStructureEntity<? extends Entity> structureEntity = MultiblockRegistry.ENTITY_TYPES.get(id).defaultEntity();
-                structureEntity.onInteract(player, this, hand, cir);
-            }
+        if(!getEntityWorld().isClient()){
+            MultiblockEntity<?,?> s = ((MultiblockCacheI) getEntityWorld()).drunk_server_toolkit$getMultiblockEntity(this.getUuid());
+            if(s != null) s.onInteract(player, hand, cir);
         }
     }
 
     @Inject(at=@At("HEAD"), method = "handleAttack", cancellable = true)
     public void injectMultiblockEntityHandleAttack(Entity attacker, CallbackInfoReturnable<Boolean> cir){
-        if(!getWorld().isClient()) {
-            String id;
-            MultiblockData data = this.getComponent(DST.ENTITY_MULTIBLOCK_DATA_COMPONENT_KEY);
-            if ((id = data.getEntityId()) != null) {
-                AbstractMultiblockStructureEntity<? extends Entity> structureEntity = MultiblockRegistry.ENTITY_TYPES.get(id).defaultEntity();
-                structureEntity.handleAttack(attacker, this, cir);
-            }
+        if(!getEntityWorld().isClient()) {
+            MultiblockEntity<?,?> s = ((MultiblockCacheI) getEntityWorld()).drunk_server_toolkit$getMultiblockEntity(this.getUuid());
+            if(s != null) s.handleAttack(attacker, cir);
         }
     }
 }

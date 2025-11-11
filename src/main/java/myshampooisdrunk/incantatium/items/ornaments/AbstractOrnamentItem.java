@@ -8,7 +8,9 @@ import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.UseCooldownComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -54,18 +56,24 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
 
     @Override
     public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, EquipmentSlot slot, CallbackInfo ci) {
-        if(entity instanceof PlayerEntity p && !world.isClient()){
+        if(entity instanceof ServerPlayerEntity p && !world.isClient()){
+//            StackReference ref = p.getStackReference(slot.getIndex());
+//            boolean bl = ref.get().equals(stack);
             AttributeModifiersComponent attrMods = AttributeModifiersComponent.DEFAULT;
             OrnamentAbilities abilities = p.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY);
             if(abilities.isActive(identifier)) {
                 if(!Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
                     stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+                    p.currentScreenHandler.sendContentUpdates();
+//                    if(bl) ref.set(stack);
                 }
                 attrMods = getAttributeModifiers();
                 if(stack == p.getOffHandStack()) getActiveEffects(stack, world, p);
             }
             else if(!abilities.isActive(identifier) && Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
                 stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, false);
+                p.currentScreenHandler.sendContentUpdates();
+//                if(bl) ref.set(stack);
             }
             if(!Objects.equals(stack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS), attrMods)){
                 stack.set(DataComponentTypes.ATTRIBUTE_MODIFIERS, attrMods);
@@ -74,10 +82,10 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
     }
 
     @Override
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+    public void use(World world, LivingEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         super.use(world, user, hand, cir);
-        if(canUse(user, hand))
-            cooldownItems(user);
+        if(user instanceof PlayerEntity p && canUse(p, hand))
+            cooldownItems(p);
     }
 
     public AttributeModifiersComponent getAttributeModifiers(){ // should only be active in offhand slot fyi

@@ -29,8 +29,8 @@ public class TickHelper {
                 return true;
             }
         }
-        if(entity.getWorld().isClient())return true;
-        MinecraftServer server = entity.getServer();
+        if(entity.getEntityWorld().isClient())return true;
+        MinecraftServer server = entity.getEntityWorld().getServer();
         if(server == null)return true;
         ServerChunkTickManager man = ((ServerChunkTickManagerInterface) server).getServerChunkTickManager();
         if(man.getChunks().isEmpty()) return true;

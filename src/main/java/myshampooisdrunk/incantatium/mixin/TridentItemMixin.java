@@ -42,7 +42,7 @@ public class TridentItemMixin {
         RiptideCooldown cooldown = instance.getComponent(Incantatium.RIPTIDE_COOLDOWN_COMPONENT_KEY);
         if(cooldown.get() > 0) return true;
 
-        if(!instance.getWorld().isClient()){
+        if(!instance.getEntityWorld().isClient()){
             instance.sendMessage(Text.literal("RIPTIDE IS ON COOLDOWN: " +
                     (cooldown.getCooldown() - cooldown.getLastUse()+19)/20 + " SECONDS REMAINING").setStyle(
                     Style.EMPTY.withColor(Colors.LIGHT_RED)

@@ -44,7 +44,7 @@ public class Incantatium implements ModInitializer {
 			new ApplyEffectsConsumeEffect(List.of(
 					new StatusEffectInstance(StatusEffects.REGENERATION, 100, 2),
 					new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 6000, 0),
-					new StatusEffectInstance(StatusEffects.ABSORPTION, 4800, 2)
+					new StatusEffectInstance(StatusEffects.ABSORPTION, 4800, 3)
 			))).build();
 	public static final RegistryKey<DamageType> TRIDENT_BYPASS = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, id("trident_bypass"));
 	public static final TagKey<EntityType<?>> CYCLONE_NO_DEFLECT = TagKey.of(RegistryKeys.ENTITY_TYPE, id("cyclone_no_deflect"));
@@ -63,6 +63,8 @@ public class Incantatium implements ModInitializer {
 			id("pedestal_storage"), PedestalInventoryStorage.class);
 	public static final ComponentKey<PedestalTextDisplay> PEDESTAL_TEXT_COMPONENT_KEY = ComponentRegistry.getOrCreate(
 			id("pedestal_text"), PedestalTextDisplay.class);
+	public static final ComponentKey<PedestalInteraction> PEDESTAL_INTERACTION_COMPONENT_KEY = ComponentRegistry.getOrCreate(
+			id("pedestal_interaction"), PedestalInteraction.class);
 
 	@Override
 	public void onInitialize() {

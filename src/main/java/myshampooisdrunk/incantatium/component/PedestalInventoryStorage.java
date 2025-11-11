@@ -1,11 +1,11 @@
 package myshampooisdrunk.incantatium.component;
 
 import myshampooisdrunk.drunk_server_toolkit.DST;
-import myshampooisdrunk.drunk_server_toolkit.component.MultiblockData;
-import myshampooisdrunk.drunk_server_toolkit.multiblock.entity.AbstractMultiblockStructureEntity;
+import myshampooisdrunk.drunk_server_toolkit.component.MultiblockEntityData;
 import myshampooisdrunk.drunk_server_toolkit.multiblock.registry.MultiblockRegistry;
 import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.multiblock.ShrineMultiblock;
+import myshampooisdrunk.incantatium.multiblock.entity.PedestalEntity;
 import myshampooisdrunk.incantatium.multiblock.inventory.MultiblockInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.DisplayEntity;
@@ -20,6 +20,7 @@ public class PedestalInventoryStorage implements InventorySlotStorage {
     private boolean dirty;
     private MultiblockInventory.Singleton singleton = MultiblockInventory.EMPTY;
     private final DisplayEntity.ItemDisplayEntity display;
+
     public PedestalInventoryStorage(DisplayEntity.ItemDisplayEntity display) {
         this.slot = -1;
         this.dirty = false;
@@ -32,46 +33,31 @@ public class PedestalInventoryStorage implements InventorySlotStorage {
     }
 
     @Override
-    public void update() {
-//        System.out.println("UPDATE ALERT!!!");
-        if(dirty && slot != -1) {
-            display.setItemStack(singleton.stack().copyWithCount(1));
-            this.markDirty(false);
-            String id;
-            MultiblockData data = display.getComponent(DST.ENTITY_MULTIBLOCK_DATA_COMPONENT_KEY);
-            if((id = data.getEntityId()) != null) {
-                AbstractMultiblockStructureEntity<? extends Entity> structureEntity = MultiblockRegistry.ENTITY_TYPES.get(id).defaultEntity();
-                if ((MultiblockRegistry.STRUCTURES.get(data.getMultiblockID()) instanceof ShrineMultiblock r) &&
-                        (display.getWorld() instanceof ServerWorld sw)) {
-                    DisplayEntity.ItemDisplayEntity core = r.getRitualCoreEntity(sw, r.centerFromPedestal(display.getPos(), slot));
-                    if(core != null) {
-                        InventoryStorage storage = core.getComponent(Incantatium.INVENTORY_STORAGE_COMPONENT_KEY);
-                        storage.setSlot(singleton, slot);
-                        storage.update();
-                    }
-                }
-            }
-//            List<? extends EntityType<?>> types = entityList.keySet().stream()
-//                    .map(AbstractMultiblockStructureEntity::getType).toList();
-//            List<Entity> entities = new ArrayList<>();
-//            types.forEach(t -> entities.addAll(world.getEntitiesByType(
-//                    t,
-//                    entityBox.offset(pos).expand(1),
-//                    e -> {
-//                        if(e instanceof DisplayEntity.ItemDisplayEntity core) {
-//                            MultiblockCoreData coreData = core.getComponent(DST.MULTIBLOCK_CORE_DATA_COMPONENT_KEY);
-//                            return !coreData.getBlockstateData().isEmpty();
-//                        }
-//                        return false;
-//                    }))
-//            );
-        }
+    public void initialize(PedestalEntity.PedestalItemEntity entity) {
+        this.dirty = entity.isDirty();
+        this.slot = entity.getSlot();
     }
 
-    @Override
-    public void setStorageSlot(int slot) {
-        this.slot = slot;
-    }
+//    @Override
+//    public void update() {
+////        System.out.println("UPDATE ALERT!!!");
+//        if(dirty && slot != -1) {
+//            display.setItemStack(singleton.stack().copyWithCount(1));
+//            this.markDirty(false);
+//            String id;
+//            MultiblockEntityData data = display.getComponent(DST.ENTITY_MULTIBLOCK_DATA_COMPONENT_KEY);
+//            AbstractMultiblockStructureEntity<? extends Entity> structureEntity = MultiblockRegistry.ENTITY_TYPES.get(id).defaultEntity();
+//            if ((MultiblockRegistry.STRUCTURES.get(data.getMultiblockID()) instanceof ShrineMultiblock r) &&
+//                    (display.getWorld() instanceof ServerWorld sw)) {
+//                DisplayEntity.ItemDisplayEntity core = r.getRitualCoreEntity(sw, r.centerFromPedestal(display.getPos(), slot));
+//                if(core != null) {
+//                    InventoryStorage storage = core.getComponent(Incantatium.INVENTORY_STORAGE_COMPONENT_KEY);
+//                    storage.setSlot(singleton, slot);
+//                    storage.update();
+//                }
+//            }
+//        }
+//    }
 
     @Override
     public boolean isDirty() {

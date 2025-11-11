@@ -105,7 +105,7 @@ public class ServerChunkTickManager {
         }
         public void addPlayer(PlayerEntity p){
             playerPacketCache.put(p.getUuidAsString(), p);
-            playerCache.put(p.getUuidAsString(),new Pair<>(p.getPos(),new Vec2f(p.getYaw(),p.getPitch())));
+            playerCache.put(p.getUuidAsString(),new Pair<>(p.getEntityPos(),new Vec2f(p.getYaw(),p.getPitch())));
         }
         public void untrackPlayer(PlayerEntity p){
             playerPacketCache.remove(p.getUuidAsString());
@@ -176,15 +176,15 @@ public class ServerChunkTickManager {
 //                        bar.removePlayer(p);
 //                        bar.addPlayer(p);
 //                    } maybe ill add this later idk
-                    if(chunkSet.contains(player.getWorld().getWorldChunk(player.getBlockPos())) && player instanceof ServerPlayerEntity p && !exempt.contains(player)){
+                    if(chunkSet.contains(player.getEntityWorld().getWorldChunk(player.getBlockPos())) && player instanceof ServerPlayerEntity p && !exempt.contains(player)){
                         p.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(p.getId(),Vec3d.ZERO));
                     }
                     player.slowMovement(
-                            player.getWorld().getBlockState(player.getBlockPos()),
+                            player.getEntityWorld().getBlockState(player.getBlockPos()),
                             Vec3d.ZERO
                     );
                     for (ServerPlayerEntity serverPlayerEntity : this.server.getPlayerManager().getPlayerList()) {
-                        if(TickHelper.shouldTick(player,player.getWorld().getWorldChunk(player.getBlockPos())))
+                        if(TickHelper.shouldTick(player,player.getEntityWorld().getWorldChunk(player.getBlockPos())))
                             serverPlayerEntity.networkHandler.sendPacket(UpdateTickRateS2CPacket.create(server.getTickManager()));
                         else {
                             serverPlayerEntity.networkHandler.sendPacket(new UpdateTickRateS2CPacket(1, true));
@@ -199,7 +199,7 @@ public class ServerChunkTickManager {
                 exempt.forEach(
                         entity -> {
                             if(entity instanceof ServerPlayerEntity player){
-                                if(!chunkSet.contains(player.getWorld().getWorldChunk(player.getBlockPos())))
+                                if(!chunkSet.contains(player.getEntityWorld().getWorldChunk(player.getBlockPos())))
                                     player.networkHandler.sendPacket(UpdateTickRateS2CPacket.create(this.server.getTickManager()));
                                     //player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(player.getId(),Vec3d.ZERO));
                             }
@@ -211,11 +211,11 @@ public class ServerChunkTickManager {
             if(frozenFor == 0) {
                 playerPacketCache.forEach((key, player) -> {
                     player.slowMovement(
-                            player.getWorld().getBlockState(player.getBlockPos()),
+                            player.getEntityWorld().getBlockState(player.getBlockPos()),
                             new Vec3d(1d,1d,1d)
                     );
                     for (ServerPlayerEntity serverPlayerEntity : this.server.getPlayerManager().getPlayerList()) {
-                        if(TickHelper.shouldTick(player,player.getWorld().getWorldChunk(player.getBlockPos())))
+                        if(TickHelper.shouldTick(player,player.getEntityWorld().getWorldChunk(player.getBlockPos())))
                             serverPlayerEntity.networkHandler.sendPacket(UpdateTickRateS2CPacket.create(this.server.getTickManager()));
                     }
 //                    this.server.getPlayerManager().sendToAround(

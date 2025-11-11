@@ -3,6 +3,7 @@ package myshampooisdrunk.incantatium.items.ornaments;
 import myshampooisdrunk.incantatium.Incantatium;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -31,9 +32,9 @@ public class HydrousOrnamentItem extends AbstractOrnamentItem{
     }
 
     @Override
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        super.use(world, user, hand, cir);
-        if(canUse(user, hand)) user.addStatusEffect(new StatusEffectInstance(StatusEffects.CONDUIT_POWER, 400, 2));
+    public void use(World world, LivingEntity l, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+        super.use(world, l, hand, cir);
+        if(l instanceof PlayerEntity user && canUse(user, hand)) user.addStatusEffect(new StatusEffectInstance(StatusEffects.CONDUIT_POWER, 400, 2));
     }
 
     @Override

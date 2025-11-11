@@ -2,6 +2,7 @@ package myshampooisdrunk.incantatium.component;
 
 import myshampooisdrunk.drunk_server_toolkit.DST;
 import myshampooisdrunk.drunk_server_toolkit.multiblock.registry.MultiblockRegistry;
+import myshampooisdrunk.drunk_server_toolkit.world.MultiblockCacheI;
 import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.multiblock.ShrineMultiblock;
 import myshampooisdrunk.incantatium.multiblock.inventory.MultiblockInventory;
@@ -9,11 +10,10 @@ import myshampooisdrunk.incantatium.multiblock.recipe.AbstractMultiblockRecipe;
 import myshampooisdrunk.incantatium.registry.IncantatiumRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.MarkerEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -30,12 +30,12 @@ public class CoreInventoryStorage implements InventoryStorage {
     private final static int CRAFTING_TIME = 100;
     private final static int TURNS = 2;
     private final static double K = 2 * Math.PI * (double) TURNS / (double) CRAFTING_TIME;
-    private final DisplayEntity.ItemDisplayEntity display;
+    private final MarkerEntity core;
     private final MultiblockInventory inventory;
     private int ticks;
 
-    public CoreInventoryStorage(DisplayEntity.ItemDisplayEntity display) {
-        this.display = display;
+    public CoreInventoryStorage(MarkerEntity core) {
+        this.core = core;
         inventory = new MultiblockInventory(8);
         ticks = -1;
     }
@@ -55,21 +55,21 @@ public class CoreInventoryStorage implements InventoryStorage {
         return ticks >= 0;
     }
 
-    @Override
-    public void update() {
-        if(isTicking()) {
-            cancel();
-        } else {
-            for (Identifier id : IncantatiumRegistry.MULTIBLOCK_RECIPES.keySet()) {
-//                System.out.println("checking id " + id);
-                if(IncantatiumRegistry.MULTIBLOCK_RECIPES.get(id).matches(inventory, display.getWorld())) {
-//                    System.out.println("matches");
-                    startTimer();
-                    break;
-                }
-            }
-        }
-    }
+//    @Override
+//    public void update() {
+//        if(isTicking()) {
+//            cancel();
+//        } else {
+//            for (Identifier id : IncantatiumRegistry.MULTIBLOCK_RECIPES.keySet()) {
+////                System.out.println("checking id " + id);
+//                if(IncantatiumRegistry.MULTIBLOCK_RECIPES.get(id).matches(inventory, core.getEntityWorld())) {
+////                    System.out.println("matches");
+//                    startTimer();
+//                    break;
+//                }
+//            }
+//        }
+//    }
 
     @Override
     public void cancel() {
@@ -97,9 +97,9 @@ public class CoreInventoryStorage implements InventoryStorage {
             if(ticks == -1) {
                 ItemStack result;
                 for (AbstractMultiblockRecipe recipe : IncantatiumRegistry.MULTIBLOCK_RECIPES.values()) {
-                    if(recipe.matches(inventory, display.getWorld()) && display.getWorld() instanceof ServerWorld sw) {
-                        result = recipe.craft(inventory, display.getRegistryManager());
-                        ItemEntity item = new ItemEntity(display.getWorld(), display.getX(), display.getY() + 4.5, display.getZ(), result);
+                    if(recipe.matches(inventory, core.getEntityWorld()) && core.getEntityWorld() instanceof ServerWorld sw) {
+                        result = recipe.craft(inventory, core.getRegistryManager());
+                        ItemEntity item = new ItemEntity(core.getEntityWorld(), core.getX(), core.getY() + 4.5, core.getZ(), result);
                         item.setPickupDelay(20);
                         item.setNeverDespawn();
                         item.setNoGravity(true);
@@ -109,23 +109,18 @@ public class CoreInventoryStorage implements InventoryStorage {
                             double d = sw.random.nextGaussian() * 2;
                             double e = sw.random.nextGaussian() * 2;
                             double f = sw.random.nextGaussian() * 2;
-                            sw.spawnParticles(ParticleTypes.END_ROD, display.getX(), display.getY() + 3.5, display.getZ(), 1, d, e, f, 0);
+                            sw.spawnParticles(ParticleTypes.END_ROD, core.getX(), core.getY() + 3.5, core.getZ(), 1, d, e, f, 0);
                         }
-                        sw.playSound(null, display.getX(), display.getY() + 0.5, display.getZ(), SoundEvents.BLOCK_BEACON_POWER_SELECT, SoundCategory.BLOCKS, 2f, 2);
+                        sw.playSound(null, core.getX(), core.getY() + 0.5, core.getZ(), SoundEvents.BLOCK_BEACON_POWER_SELECT, SoundCategory.BLOCKS, 2f, 2);
                         sw.spawnEntity(item);
                         inventory.clear();
-                        if(MultiblockRegistry.STRUCTURES.get(display.getComponent(DST.ENTITY_MULTIBLOCK_DATA_COMPONENT_KEY).getMultiblockID()) instanceof ShrineMultiblock s) {
+                        if (((MultiblockCacheI) core.getEntityWorld()).drunk_server_toolkit$getStructure(core.getUuid()) instanceof ShrineMultiblock shrine) {
                             for (int i = 0; i < 8; i++) {
-                                DisplayEntity.ItemDisplayEntity disp = s.getPedestalEntity(sw, i, display);
-                                InventorySlotStorage pedestal = disp.getComponent(Incantatium.PEDESTAL_STORAGE_COMPONENT_KEY);
-                                pedestal.setEntry(MultiblockInventory.EMPTY);
-                                pedestal.markDirty(true);
-                                pedestal.update();
-                                List<DisplayEntity.TextDisplayEntity> entities = disp.getWorld().getEntitiesByType(EntityType.TEXT_DISPLAY, disp.getBoundingBox().expand(1).expand(0,2,0), e -> e.getComponent(Incantatium.PEDESTAL_TEXT_COMPONENT_KEY).getSlot() == pedestal.getSlot());
-                                if(!entities.isEmpty()) {
-                                    entities.getFirst().getComponent(Incantatium.PEDESTAL_TEXT_COMPONENT_KEY).withItemDisplay(disp).update();
-                                }
-
+                                shrine.getEntry(i).ifPresent(p -> {
+                                    p.itemEntity().getEntity().getComponent(Incantatium.PEDESTAL_STORAGE_COMPONENT_KEY).setEntry(MultiblockInventory.EMPTY);
+                                    p.itemEntity().markDirty(true);
+                                    p.itemEntity().update();
+                                });
                             }
                         }
                         break;
@@ -134,14 +129,14 @@ public class CoreInventoryStorage implements InventoryStorage {
             }
         }
         else if(ticks == -2) {
-            if(display.getWorld() instanceof ServerWorld sw) {
+            if(core.getEntityWorld() instanceof ServerWorld sw) {
                 for (int i = 0; i < 50; i++) {
                     double d = sw.random.nextGaussian() * 1.5;
                     double e = sw.random.nextGaussian() * 1.5;
                     double f = sw.random.nextGaussian() * 1.5;
-                    sw.spawnParticles(ParticleTypes.ANGRY_VILLAGER, display.getX(), display.getY() + 1.5, display.getZ(), 1, d, e, f, 0);
+                    sw.spawnParticles(ParticleTypes.ANGRY_VILLAGER, core.getX(), core.getY() + 1.5, core.getZ(), 1, d, e, f, 0);
                 }
-                sw.playSound(null, display.getX(), display.getY() + 0.5, display.getZ(), SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 2f, 0.75f);
+                sw.playSound(null, core.getX(), core.getY() + 0.5, core.getZ(), SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 2f, 0.75f);
             }
             ticks = -1;
         }
@@ -149,7 +144,7 @@ public class CoreInventoryStorage implements InventoryStorage {
 
     public void tickCrafting() {
         int t = CRAFTING_TIME - ticks;
-        if(display.getWorld() instanceof ServerWorld sw) {
+        if(core.getEntityWorld() instanceof ServerWorld sw) {
             assert 0 <= t && t <= CRAFTING_TIME;
             double c = CRAFTING_TIME / 4d;
             double x = (CRAFTING_TIME - t) * Math.cos(K * t);
@@ -208,10 +203,10 @@ public class CoreInventoryStorage implements InventoryStorage {
                 z = oldZ * rotX - oldX * rotZ;
 //                dx = oldDx * rotX + oldDz * rotZ;
 //                dz = oldDz * rotX - oldDx * rotZ;
-                sw.spawnParticles(ParticleTypes.WITCH, display.getX() + x, display.getY() + y - 3, display.getZ() + z, 1, 0, 0, 0, 0);
+                sw.spawnParticles(ParticleTypes.WITCH, core.getX() + x, core.getY() + y - 3, core.getZ() + z, 1, 0, 0, 0, 0);
             }
             if(t % 5 == 0) {
-                sw.playSound(null, display.getX(), display.getY() + 0.5, display.getZ(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1.25f, 0.5f + t/50f);
+                sw.playSound(null, core.getX(), core.getY() + 0.5, core.getZ(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1.25f, 0.5f + t/50f);
             }
         }
     }

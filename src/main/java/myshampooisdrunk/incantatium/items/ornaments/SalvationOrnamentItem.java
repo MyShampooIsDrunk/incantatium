@@ -3,6 +3,7 @@ package myshampooisdrunk.incantatium.items.ornaments;
 import myshampooisdrunk.incantatium.Incantatium;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DeathProtectionComponent;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -44,7 +45,7 @@ public class SalvationOrnamentItem extends AbstractOrnamentItem{
     }
 
     @Override
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+    public void use(World world, LivingEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         cir.setReturnValue(ActionResult.PASS);
     }
 }

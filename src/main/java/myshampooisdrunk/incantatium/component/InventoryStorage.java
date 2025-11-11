@@ -17,8 +17,6 @@ public interface InventoryStorage extends ServerTickingComponent {
         getInventory().set(singleton, slot);
     }
 
-    void update();
-
     void startTimer();
 
     boolean isTicking();

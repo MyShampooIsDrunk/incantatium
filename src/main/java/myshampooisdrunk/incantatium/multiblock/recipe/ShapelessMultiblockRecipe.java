@@ -6,7 +6,7 @@ import net.minecraft.world.World;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ShapelessMultiblockRecipe extends AbstractMultiblockRecipe{
+public class ShapelessMultiblockRecipe extends AbstractMultiblockRecipe {
     private final Set<MultiblockEntryIngredient> ingredients;
 
     public ShapelessMultiblockRecipe(ItemStack result) {

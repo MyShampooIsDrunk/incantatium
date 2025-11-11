@@ -7,6 +7,7 @@ import myshampooisdrunk.incantatium.server.ServerChunkTickManager;
 import myshampooisdrunk.incantatium.server.ServerChunkTickManagerInterface;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.server.MinecraftServer;
@@ -15,6 +16,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Unit;
@@ -65,29 +67,33 @@ public class TimeStopItem extends AbstractCustomItem {
     }
 
     @Override
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable cir) {
+    public void use(World world, LivingEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         if(world.isClient()) return;
-        if(!((CustomItemCooldownManagerI)user).drunk_server_toolkit$getCustomItemCooldownManager().isCoolingDown("time_stop")){
-            world.playSound(null,user.getBlockPos().up(), SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS,1f,1.5f);
-            MinecraftServer server = world.getServer();
-            ServerChunkTickManager man = ((ServerChunkTickManagerInterface) Objects.requireNonNull(server)).getServerChunkTickManager();
-            ServerChunkTickManager.ChunkTickManager chunkMan = man.createManager("time_stop");
-            for(int dx = -1; dx <=1; dx++){
-                for(int dz = -1; dz <=1; dz++){
-                    chunkMan = chunkMan.addChunk(world.getWorldChunk(user.getBlockPos().add(dx * 16, 0, dz * 16)));
+
+        if(user instanceof PlayerEntity player) {
+            if(!((CustomItemCooldownManagerI)user).drunk_server_toolkit$getCustomItemCooldownManager().isCoolingDown("time_stop")){
+                world.playSound(null,user.getBlockPos().up(), SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS,1f,1.5f);
+                MinecraftServer server = world.getServer();
+                ServerChunkTickManager man = ((ServerChunkTickManagerInterface) Objects.requireNonNull(server)).getServerChunkTickManager();
+                ServerChunkTickManager.ChunkTickManager chunkMan = man.createManager("time_stop");
+                for(int dx = -1; dx <=1; dx++){
+                    for(int dz = -1; dz <=1; dz++){
+                        chunkMan = chunkMan.addChunk(world.getWorldChunk(user.getBlockPos().add(dx * 16, 0, dz * 16)));
+                    }
                 }
+                man.addChunk(chunkMan);
+                chunkMan.exempt(user);
+                chunkMan.freezeFor(200);
+                ((CustomItemCooldownManagerI)user).drunk_server_toolkit$getCustomItemCooldownManager().set("time_stop",ABILITY_COOLDOWN_TICKS);
+                player.getItemCooldownManager().set(user.getStackInHand(hand), ABILITY_COOLDOWN_TICKS);
+            }else{
+                player.sendMessage(Text.literal(String.format("There are %s second(s) left until you may use this item again",
+                                (int)(0.95+((CustomItemCooldownManagerI) user).drunk_server_toolkit$getCustomItemCooldownManager()
+                                        .getCooldownProgress("time_stop",0)*(ABILITY_COOLDOWN_TICKS/20f))))
+                        .setStyle(Style.EMPTY.withBold(true).withColor(Colors.LIGHT_RED).withItalic(false)), true);
             }
-            man.addChunk(chunkMan);
-            chunkMan.exempt(user);
-            chunkMan.freezeFor(200);
-            ((CustomItemCooldownManagerI)user).drunk_server_toolkit$getCustomItemCooldownManager().set("time_stop",ABILITY_COOLDOWN_TICKS);
-            user.getItemCooldownManager().set(user.getStackInHand(hand), ABILITY_COOLDOWN_TICKS);
-        }else{
-            user.sendMessage(Text.literal(String.format("There are %s second(s) left until you may use this item again",
-                            (int)(0.95+((CustomItemCooldownManagerI) user).drunk_server_toolkit$getCustomItemCooldownManager()
-                                    .getCooldownProgress("time_stop",0)*(ABILITY_COOLDOWN_TICKS/20f))))
-                    .setStyle(Style.EMPTY.withBold(true).withColor(Colors.LIGHT_RED).withItalic(false)), true);
         }
+
     }
 
     public static int rgbToInt(int[] rgb){

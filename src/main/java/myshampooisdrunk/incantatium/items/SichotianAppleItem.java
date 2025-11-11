@@ -26,7 +26,7 @@ import java.util.Map;
 
 import static myshampooisdrunk.incantatium.items.TimeStopItem.rgbToInt;
 
-public class SichotianAppleItem extends AbstractCustomItem implements CustomRecipe<CraftingRecipeInput> {
+public class SichotianAppleItem extends AbstractRecipeItem<CraftingRecipeInput> {
 
     public static final FoodComponent SICHOTIAN_APPLE_HUNGER = new FoodComponent.Builder().nutrition(10).saturationModifier(2f).alwaysEdible().build();
     public static final ConsumableComponent SICHOTIAN_APPLE_EFFECTS = ConsumableComponent.builder().consumeEffect(

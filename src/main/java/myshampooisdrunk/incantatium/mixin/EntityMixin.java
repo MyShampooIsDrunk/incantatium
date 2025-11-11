@@ -12,7 +12,9 @@ import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -21,11 +23,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Entity.class)
 public class EntityMixin {
 
+    @Shadow private World world;
     private final Entity dis = (Entity) (Object) this;
 
     @Inject(method = "getProjectileDeflection", at=@At("HEAD"), cancellable = true)
     public void cycloneModifyProjectileDeflection(ProjectileEntity projectileEntity, CallbackInfoReturnable<ProjectileDeflection> cir){
-        if(dis instanceof PlayerEntity p && !p.getWorld().isClient() && p.getWorld() instanceof ServerWorld sWorld){
+        if(dis instanceof PlayerEntity p && !world.isClient() && world instanceof ServerWorld sWorld){
             if(p.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY).isActive(IncantatiumRegistry.CYCLONE_ORNAMENT.getIdentifier()))
                 cir.setReturnValue((projectile, hitEntity, random) -> {
                     //piercing 7 to go through shield + cyclone or pierce 4 to go through just cyclone

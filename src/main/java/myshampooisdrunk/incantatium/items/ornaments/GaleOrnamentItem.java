@@ -4,6 +4,7 @@ import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.component.EnduranceEffect;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,17 +29,18 @@ public class GaleOrnamentItem extends AbstractOrnamentItem{
     }
 
     @Override
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        super.use(world, user, hand, cir);
-        if(canUse(user, hand)){
+    public void use(World world, LivingEntity l, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+        super.use(world, l, hand, cir);
+        if(l instanceof PlayerEntity user && canUse(user, hand)){
 
             if(user instanceof ServerPlayerEntity p) {
                 Vec3d rot = p.getRotationVector().normalize();
                 double d = 2;
-                Vec3d vel = p.getVelocity();
-                Vec3d vf = rot.multiply(rot.dotProduct(vel)/2+d);
-                System.out.println("set velocity to " + vf);
-                p.setVelocity(vf);//projection of existing velocity vector onto rotation vector divided by 2 + d * rot
+                Vec3d vf = rot.multiply(d);
+//                Vec3d vel = p.getVelocity();
+//                Vec3d vf = rot.multiply(rot.dotProduct(vel)/2+d); //projection of existing velocity vector onto rotation vector divided by 2 + d * rot
+//                System.out.println("set velocity to " + vf);
+                p.setVelocity(vf);
                 p.velocityDirty = true;
                 p.velocityModified = true;
             }

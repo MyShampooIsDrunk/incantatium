@@ -15,7 +15,8 @@
 			"incantatium:endurance_effect",
 			"incantatium:inventory_storage",
 			"incantatium:pedestal_storage",
-			"incantatium:pedestal_text"
+			"incantatium:pedestal_text",
+			"incantatium:pedestal_interaction"
 		]
 	},
 	"contact": {
@@ -41,7 +42,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.16.14",
-		"minecraft": ["~1.21.6","~1.21.7"],
+		"minecraft": ["~1.21.10"],
 		"java": ">=21",
 		"fabric-api": "*"
 	},

@@ -26,7 +26,7 @@ public class PlayerEnduranceEffect implements EnduranceEffect{
     @Override
     public void activate(int ticks) {
         this.tick = ticks;
-        if(player.getWorld() instanceof ServerWorld sw) {
+        if(player.getEntityWorld() instanceof ServerWorld sw) {
             sw.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS);
         }
     }
@@ -34,7 +34,7 @@ public class PlayerEnduranceEffect implements EnduranceEffect{
     @Override
     public void serverTick() {
         if(tick == 0){
-            if(player.getWorld() instanceof ServerWorld sw) {
+            if(player.getEntityWorld() instanceof ServerWorld sw) {
                 sw.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS);
             }
         }

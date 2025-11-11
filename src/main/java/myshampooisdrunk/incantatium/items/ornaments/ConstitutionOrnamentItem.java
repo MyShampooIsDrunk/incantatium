@@ -3,6 +3,7 @@ package myshampooisdrunk.incantatium.items.ornaments;
 import myshampooisdrunk.incantatium.Incantatium;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,7 +28,7 @@ public class ConstitutionOrnamentItem extends AbstractOrnamentItem{
     }
 
     @Override
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+    public void use(World world, LivingEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         cir.setReturnValue(ActionResult.PASS);
     }
 

@@ -9,6 +9,7 @@ import myshampooisdrunk.incantatium.Incantatium;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.UseCooldownComponent;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -33,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class ThunderstormItem extends AbstractCustomItem implements CustomRecipe<CraftingRecipeInput> {
+public class ThunderstormItem extends AbstractRecipeItem<CraftingRecipeInput> {
     public ThunderstormItem() {
         super(Items.FERMENTED_SPIDER_EYE, Incantatium.id("thunderstorm_item"), null , Incantatium.getModel(Incantatium.id("thunderstorm_item")));
         addComponent(DataComponentTypes.ITEM_NAME, Text.literal("Aspect of Thunder"));
@@ -44,15 +45,16 @@ public class ThunderstormItem extends AbstractCustomItem implements CustomRecipe
     }
 
     @Override
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        if(!world.isClient()) {
+    public void use(World world, LivingEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+        if(!world.isClient() && world instanceof ServerWorld sw &&
+                user instanceof PlayerEntity player && sw.getDimension().hasSkyLight() && !world.getDimension().hasCeiling()) {
             ItemStack itemStack = user.getStackInHand(hand);
-            if(!user.getItemCooldownManager().isCoolingDown(itemStack)){
-                world.getServer().getOverworld().setWeather(0,
+            if(!player.getItemCooldownManager().isCoolingDown(itemStack)){
+                sw.setWeather(0,
                         ServerWorld.THUNDER_WEATHER_DURATION_PROVIDER.get(world.getRandom()), true, true);
                 cir.setReturnValue(ActionResult.CONSUME);
                 itemStack.decrementUnlessCreative(1, user);
-                user.getItemCooldownManager().set(itemStack, 100);
+                player.getItemCooldownManager().set(itemStack, 100);
 
             } else cir.setReturnValue(ActionResult.FAIL);
 //            cooldown.set("thunderstorm_item", 100);

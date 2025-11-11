@@ -52,7 +52,7 @@ public class RevelationOrnamentItem extends AbstractOrnamentItem{
 
         if(entity instanceof ServerPlayerEntity sp && (abilities = sp.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY)).isActive(identifier)){
             Toggle toggle = sp.getComponent(Incantatium.TOGGLE_COMPONENT_KEY);
-            Team team = new Team(sp.getScoreboard(),"aaaaaaaaaaaaaaaaaaaaaaaaaatijkaitjidjhdlhf");
+            Team team = new Team(sp.getEntityWorld().getScoreboard(),"aaaaaaaaaaaaaaaaaaaaaaaaaatijkaitjidjhdlhf");
             team.setShowFriendlyInvisibles(true);
             List<? extends PlayerEntity> players = world.getPlayers();
             team.getPlayerList().addAll(players.stream().map(PlayerEntity::getNameForScoreboard).toList());
@@ -73,12 +73,12 @@ public class RevelationOrnamentItem extends AbstractOrnamentItem{
     }
 
     @Override
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        super.use(world, user, hand, cir);
-        if(canUse(user, hand)){
-            List<Entity> entities = world.getOtherEntities(user, Box.of(user.getPos(),50,50,50), e -> e instanceof MobEntity);
+    public void use(World world, LivingEntity l, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+        super.use(world, l, hand, cir);
+        if(l instanceof PlayerEntity user && canUse(user, hand)){
+            List<Entity> entities = world.getOtherEntities(user, Box.of(user.getEntityPos(),50,50,50), e -> e instanceof MobEntity);
             entities.forEach(e -> {
-                if (e instanceof LivingEntity l) l.setStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 400), user);
+                if (e instanceof LivingEntity l1) l1.setStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 400), user);
             });
             cir.setReturnValue(ActionResult.SUCCESS);
         } else cir.setReturnValue(ActionResult.FAIL);

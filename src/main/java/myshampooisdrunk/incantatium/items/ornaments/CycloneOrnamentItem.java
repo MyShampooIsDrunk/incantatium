@@ -1,6 +1,7 @@
 package myshampooisdrunk.incantatium.items.ornaments;
 
 import myshampooisdrunk.incantatium.Incantatium;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.WindChargeEntity;
@@ -21,12 +22,12 @@ public class CycloneOrnamentItem extends AbstractOrnamentItem{
     }
 
     @Override
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        super.use(world, user, hand, cir);
-        if(canUse(user, hand)) {
+    public void use(World world, LivingEntity e, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+        super.use(world, e, hand, cir);
+        if(e instanceof PlayerEntity user && canUse(user, hand)) {
             if (world instanceof ServerWorld serverWorld) {
                 ProjectileEntity.spawnWithVelocity(
-                        (world2, shooter, stack) -> new WindChargeEntity(user, world, user.getPos().getX(), user.getEyePos().getY(), user.getPos().getZ()),
+                        (world2, shooter, stack) -> new WindChargeEntity(user, world, user.getX(), user.getEyePos().getY(), user.getZ()),
                         serverWorld,
                         user.getStackInHand(hand),
                         user,

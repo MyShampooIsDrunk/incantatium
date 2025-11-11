@@ -122,7 +122,7 @@ public class DivineCrownItem extends AbstractCustomArmorItem{
             if(slot.isArmorSlot() && slot == EquipmentSlot.HEAD){
                 List<StatusEffectInstance> effects = new ArrayList<>();
                 int demos = sWorld.getPlayers(TargetPredicate.createAttackable()
-                        .setPredicate((l,w) -> p.distanceTo(l) <= 50), p, Box.of(p.getPos(), 50,50,50)).size();
+                        .setPredicate((l,w) -> p.distanceTo(l) <= 50), p, Box.of(p.getEntityPos(), 50,50,50)).size();
                 effects.add(new StatusEffectInstance(StatusEffects.GLOWING, 10));
                 if(demos >= 1){
                     effects.add(new StatusEffectInstance(StatusEffects.REGENERATION, 10));

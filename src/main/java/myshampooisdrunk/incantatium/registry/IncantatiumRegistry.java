@@ -2,12 +2,11 @@ package myshampooisdrunk.incantatium.registry;
 
 import myshampooisdrunk.drunk_server_toolkit.item.AbstractCustomItem;
 import myshampooisdrunk.drunk_server_toolkit.item.potion.CustomPotion;
-import myshampooisdrunk.drunk_server_toolkit.register.CustomItemRegistry;
+import myshampooisdrunk.drunk_server_toolkit.registry.CustomItemRegistry;
 import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.items.*;
 import myshampooisdrunk.incantatium.items.ornaments.*;
 import myshampooisdrunk.incantatium.multiblock.IncantatiumMultiblockRegistry;
-import myshampooisdrunk.incantatium.multiblock.entity.PedestalEntityGenerator;
 import myshampooisdrunk.incantatium.multiblock.recipe.AbstractMultiblockRecipe;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentType;
@@ -29,7 +28,7 @@ public class IncantatiumRegistry {
     public static final AbstractCustomItem DIVINE_CROWN = CustomItemRegistry.registerItem(new DivineCrownItem());
     public static final AbstractCustomItem TIME_STOP_SWORD = CustomItemRegistry.registerItem(new TimeStopItem());
     public static final ThunderstormItem THUNDERSTORM_ITEM = (ThunderstormItem)CustomItemRegistry.registerWithRecipe(new ThunderstormItem());
-    public static final SichotianAppleItem SICHOTIAN_APPLE = (SichotianAppleItem)CustomItemRegistry.registerWithRecipe(new SichotianAppleItem());
+    public static final SichotianAppleItem SICHOTIAN_APPLE = CustomItemRegistry.registerWithRecipe(new SichotianAppleItem());
 
     public static final AbstractCustomItem SHRINE_DISPLAY_ITEM = CustomItemRegistry.registerItem(new ShrineDisplayItem());
 
