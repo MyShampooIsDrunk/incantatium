@@ -1,0 +1,43 @@
+{
+  "anvil_cost": 2,
+  "description": {
+    "translate": "enchantment.incantatium.bulky"
+  },
+  "effects": {
+    "minecraft:attributes": [
+      {
+        "attribute": "minecraft:max_health",
+        "id": "incantatium:bulky_max_health",
+        "amount": {
+          "type": "minecraft:lookup",
+          "values": [
+            6,
+            12,
+            20
+          ],
+          "fallback": {
+            "type": "minecraft:linear",
+            "base": 0,
+            "per_level_above_first": 10
+          }
+        },
+        "operation": "add_value"
+      }
+    ]
+  },
+  "exclusive_set": "#minecraft:exclusive_set/armor",
+  "max_cost": {
+    "base": 23,
+    "per_level_above_first": 12
+  },
+  "max_level": 2,
+  "min_cost": {
+    "base": 11,
+    "per_level_above_first": 12
+  },
+  "slots": [
+    "body"
+  ],
+  "supported_items": "#incantatium:enchantable/horse_armor",
+  "weight": 2
+}

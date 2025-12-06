@@ -54,11 +54,11 @@ public class IncantatiumMultiblockRegistry {
                         IncantatiumRegistry.SICHOTIAN_APPLE, 24, null))
                 .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.DIRT,65).build())
                 .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.HEAVY_CORE,300).build());
-        registerMultiblockRecipe(r, Incantatium.id("goon4"));
+        registerMultiblockRecipe(r, Incantatium.id("dest4"));
         registerMultiblockRecipe(
                 new ShapelessMultiblockRecipe(Items.WAXED_OXIDIZED_COPPER_BULB.getDefaultStack())
                         .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.HEAVY_CORE,5).build()),
-                Incantatium.id("goon5"));
+                Incantatium.id("dest5"));
     }
 
 

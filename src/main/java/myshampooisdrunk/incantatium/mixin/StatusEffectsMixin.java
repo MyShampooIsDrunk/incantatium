@@ -19,14 +19,14 @@ public abstract class StatusEffectsMixin {
         return null;
     }
 
-    @Redirect(method = "<clinit>", at=@At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/entity/effect/StatusEffect;addAttributeModifier(Lnet/minecraft/registry/entry/RegistryEntry;Lnet/minecraft/util/Identifier;DLnet/minecraft/entity/attribute/EntityAttributeModifier$Operation;)Lnet/minecraft/entity/effect/StatusEffect;",
-            ordinal = 9
-    ))
-    private static StatusEffect modifyAttribute(StatusEffect instance, RegistryEntry<EntityAttribute> attribute, Identifier id, double amount, EntityAttributeModifier.Operation operation){
-        return instance.addAttributeModifier(EntityAttributes.ARMOR, id, -2.5, operation);
-    }
+//    @Redirect(method = "<clinit>", at=@At(
+//            value = "INVOKE",
+//            target = "Lnet/minecraft/entity/effect/StatusEffect;addAttributeModifier(Lnet/minecraft/registry/entry/RegistryEntry;Lnet/minecraft/util/Identifier;DLnet/minecraft/entity/attribute/EntityAttributeModifier$Operation;)Lnet/minecraft/entity/effect/StatusEffect;",
+//            ordinal = 9
+//    ))
+//    private static StatusEffect modifyAttribute(StatusEffect instance, RegistryEntry<EntityAttribute> attribute, Identifier id, double amount, EntityAttributeModifier.Operation operation){
+//        return instance.addAttributeModifier(EntityAttributes.ARMOR, id, -2.5, operation);
+//    }
 
     @Redirect(method = "<clinit>", at= @At(value = "INVOKE", target = "Lnet/minecraft/entity/effect/StatusEffects;register(Ljava/lang/String;Lnet/minecraft/entity/effect/StatusEffect;)Lnet/minecraft/registry/entry/RegistryEntry;", ordinal = 28))
     private static RegistryEntry<StatusEffect> redirectConduitPower(String id, StatusEffect statusEffect) {

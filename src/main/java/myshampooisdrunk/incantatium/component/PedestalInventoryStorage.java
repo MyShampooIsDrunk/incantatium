@@ -22,7 +22,7 @@ public class PedestalInventoryStorage implements InventorySlotStorage {
     private final DisplayEntity.ItemDisplayEntity display;
 
     public PedestalInventoryStorage(DisplayEntity.ItemDisplayEntity display) {
-        this.slot = -1;
+        this.slot = -2;
         this.dirty = false;
         this.display = display;
     }

@@ -20,9 +20,13 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Uuids;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static myshampooisdrunk.incantatium.multiblock.ShrineMultiblock.RT2;
 
@@ -32,17 +36,30 @@ public class CoreInventoryStorage implements InventoryStorage {
     private final static double K = 2 * Math.PI * (double) TURNS / (double) CRAFTING_TIME;
     private final MarkerEntity core;
     private final MultiblockInventory inventory;
+    private final ShrineMultiblock.PedestalEntry[] pedestals;
     private int ticks;
 
     public CoreInventoryStorage(MarkerEntity core) {
         this.core = core;
-        inventory = new MultiblockInventory(8);
-        ticks = -1;
+        this.inventory = new MultiblockInventory(8);
+        this.ticks = -1;
+        this.pedestals = new ShrineMultiblock.PedestalEntry[8];
+        Arrays.fill(pedestals, null);
     }
 
     @Override
     public MultiblockInventory getInventory() {
         return inventory;
+    }
+
+    @Override
+    public ShrineMultiblock.PedestalEntry[] getPedestals() {
+        return pedestals;
+    }
+
+    @Override
+    public void copyPedestals(ShrineMultiblock.PedestalEntry[] pedestals) {
+        System.arraycopy(pedestals, 0, this.pedestals, 0, this.pedestals.length);
     }
 
     @Override
@@ -55,21 +72,21 @@ public class CoreInventoryStorage implements InventoryStorage {
         return ticks >= 0;
     }
 
-//    @Override
-//    public void update() {
-//        if(isTicking()) {
-//            cancel();
-//        } else {
-//            for (Identifier id : IncantatiumRegistry.MULTIBLOCK_RECIPES.keySet()) {
-////                System.out.println("checking id " + id);
-//                if(IncantatiumRegistry.MULTIBLOCK_RECIPES.get(id).matches(inventory, core.getEntityWorld())) {
-////                    System.out.println("matches");
-//                    startTimer();
-//                    break;
-//                }
-//            }
-//        }
-//    }
+    @Override
+    public void update() {
+        if(isTicking()) {
+            cancel();
+        } else {
+            for (Identifier id : IncantatiumRegistry.MULTIBLOCK_RECIPES.keySet()) {
+//                System.out.println("checking id " + id);
+                if(IncantatiumRegistry.MULTIBLOCK_RECIPES.get(id).matches(inventory, core.getEntityWorld())) {
+//                    System.out.println("matches");
+                    startTimer();
+                    break;
+                }
+            }
+        }
+    }
 
     @Override
     public void cancel() {
@@ -80,6 +97,19 @@ public class CoreInventoryStorage implements InventoryStorage {
     public void readData(ReadView readView) {
         this.inventory.readData(readView);
         ticks = readView.getInt("crafting_ticks", -1);
+//        Incantatium.LOGGER.info("READ DATA!");
+        for (ReadView slot : readView.getListReadView("slots")) {
+            int s = slot.getInt("slot", -1);
+            if(s != -1) {
+//                Incantatium.LOGGER.info("READ SLOT!!! {}", s);
+                Optional<UUID> item = slot.read("item", Uuids.CODEC);
+                Optional<UUID> text = slot.read("text", Uuids.CODEC);
+                Optional<UUID> interaction = slot.read("interaction", Uuids.CODEC);
+                if(item.isPresent() && text.isPresent() && interaction.isPresent()) {
+                    pedestals[s] = new ShrineMultiblock.PedestalEntry(item.get(), text.get(), interaction.get(), core.getEntityWorld());
+                } //else Incantatium.LOGGER.info("COULDNT LOAD SLOT {}", s);
+            }
+        }
     }
 
     @Override
@@ -87,6 +117,31 @@ public class CoreInventoryStorage implements InventoryStorage {
         if(!inventory.isEmpty())
             this.inventory.writeData(writeView);
         writeView.putInt("crafting_ticks",ticks);
+
+
+        boolean bl = true;
+
+        for (ShrineMultiblock.PedestalEntry pedestal : pedestals) {
+            if(pedestal == null) {
+                bl = false;
+                break;
+            }
+        }
+
+//        Incantatium.LOGGER.info("WROTE DATA!");
+        if(bl) {
+            WriteView.ListView list = writeView.getList("slots");
+
+            for (int i = 0; i < pedestals.length; i++) {
+//                Incantatium.LOGGER.info("WROTE SLOT!!! {}", i);
+                ShrineMultiblock.PedestalEntry entry = pedestals[i];
+                WriteView slot = list.add();
+                slot.putInt("slot", i);
+                slot.put("item", Uuids.CODEC, entry.itemUuid());
+                slot.put("text", Uuids.CODEC, entry.textUuid());
+                slot.put("interaction", Uuids.CODEC, entry.interactionUuid());
+            }
+        }
     }
 
     @Override
@@ -116,10 +171,10 @@ public class CoreInventoryStorage implements InventoryStorage {
                         inventory.clear();
                         if (((MultiblockCacheI) core.getEntityWorld()).drunk_server_toolkit$getStructure(core.getUuid()) instanceof ShrineMultiblock shrine) {
                             for (int i = 0; i < 8; i++) {
-                                shrine.getEntry(i).ifPresent(p -> {
-                                    p.itemEntity().getEntity().getComponent(Incantatium.PEDESTAL_STORAGE_COMPONENT_KEY).setEntry(MultiblockInventory.EMPTY);
-                                    p.itemEntity().markDirty(true);
-                                    p.itemEntity().update();
+                                shrine.getEntry(i).flatMap(ShrineMultiblock.PedestalEntry::item).ifPresent(e -> {
+                                    e.getEntity().getComponent(Incantatium.PEDESTAL_STORAGE_COMPONENT_KEY).setEntry(MultiblockInventory.EMPTY);
+                                    e.markDirty(true);
+                                    e.update();
                                 });
                             }
                         }

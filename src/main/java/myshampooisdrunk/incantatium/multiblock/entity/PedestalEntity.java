@@ -6,12 +6,14 @@ import myshampooisdrunk.drunk_server_toolkit.multiblock.structure.MultiblockStru
 import myshampooisdrunk.drunk_server_toolkit.world.MultiblockCacheI;
 import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.component.InventorySlotStorage;
+import myshampooisdrunk.incantatium.component.InventoryStorage;
 import myshampooisdrunk.incantatium.component.PedestalInteraction;
 import myshampooisdrunk.incantatium.component.PedestalInventoryStorage;
 import myshampooisdrunk.incantatium.multiblock.ShrineMultiblock;
 import myshampooisdrunk.incantatium.multiblock.inventory.MultiblockInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.MarkerEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.decoration.InteractionEntity;
@@ -36,7 +38,7 @@ public abstract class PedestalEntity<E extends Entity, T extends PedestalEntity<
     protected final int slot;
 
     public PedestalEntity(MultiblockEntityType<E, T> type, World world, E entity) {
-        super(type, world);
+        super(type, world, entity);
         this.slot = initSlot(entity);
     }
 
@@ -104,13 +106,13 @@ public abstract class PedestalEntity<E extends Entity, T extends PedestalEntity<
         @Override
         public void initializeFromData(DisplayEntity.ItemDisplayEntity entity) {
             super.initializeFromData(entity);
-            if(((MultiblockCacheI) world).drunk_server_toolkit$getStructure(coreUuid) instanceof ShrineMultiblock shrine) {
-                ShrineMultiblock.PedestalEntry entry = shrine.getEntry(this.slot).orElse(new ShrineMultiblock.PedestalEntry(null, null, null));
-                if(entry.itemEntity() == null) {
-                    entry = entry.withItem(this);
-                    shrine.setEntry(this.slot, entry);
-                }
-            }
+//            if(((MultiblockCacheI) world).drunk_server_toolkit$getStructure(coreUuid) instanceof ShrineMultiblock shrine) {
+//                ShrineMultiblock.PedestalEntry entry = shrine.getEntry(this.slot).orElse(new ShrineMultiblock.PedestalEntry(null, null, null));
+//                if(entry.itemEntity() == null) {
+//                    entry = entry.withItem(this);
+//                    shrine.setEntry(this.slot, entry);
+//                }
+//            }
         }
 
         public void markDirty(boolean dirty) {
@@ -132,19 +134,24 @@ public abstract class PedestalEntity<E extends Entity, T extends PedestalEntity<
                     ret.append(e.stack().getItemName()).append(Text.literal("\n" + e.count()));
                 }
 
-                getEntry().ifPresent(p -> p.textEntity().getEntity().setText(ret));
+                getEntry().flatMap(ShrineMultiblock.PedestalEntry::text).ifPresent(t -> t.getEntity().setText(ret));
+                if(world.getEntity(coreUuid) instanceof MarkerEntity marker) {
+                    InventoryStorage coreStorage = marker.getComponent(Incantatium.INVENTORY_STORAGE_COMPONENT_KEY);
+                    coreStorage.setSlot(e, this.slot);
+                    coreStorage.update();
+                }
             }
         }
 
         @Override
         public DisplayEntity.ItemDisplayEntity create(MultiblockStructure structure, BlockPos center, Vec3d relative, SpawnReason reason) {
-            DisplayEntity.ItemDisplayEntity ret = super.create(structure, center, relative, reason);
-            Vec3d spawnPos = relative.add(new Vec3d(center));
+            Vec3d spawnPos = relative.add(0.5,0,0.5);
+            DisplayEntity.ItemDisplayEntity ret = super.create(structure, center, spawnPos, reason);
             ret.getComponent(Incantatium.PEDESTAL_STORAGE_COMPONENT_KEY).initialize(this);
             ret.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
             ret.setItemDisplayContext(ItemDisplayContext.GUI);
             ret.setTransformation(new AffineTransformation(new Vector3f(), new Quaternionf(0,1,0,0), new Vector3f(0.5f,0.5f,0.5f), new Quaternionf()));
-            ret.refreshPositionAndAngles(spawnPos,0 ,-90);
+            ret.refreshPositionAndAngles(spawnPos.add(new Vec3d(center)),0 ,-90);
             return ret;
             //TODO: inventory stuff
         }
@@ -241,18 +248,18 @@ public abstract class PedestalEntity<E extends Entity, T extends PedestalEntity<
         @Override
         public void initializeFromData(DisplayEntity.TextDisplayEntity entity) {
             super.initializeFromData(entity);
-            if(((MultiblockCacheI) world).drunk_server_toolkit$getStructure(coreUuid) instanceof ShrineMultiblock shrine) {
-                ShrineMultiblock.PedestalEntry entry = shrine.getEntry(this.slot).orElse(new ShrineMultiblock.PedestalEntry(null, null, null));
-                if(entry.textEntity() == null) {
-                    entry = entry.withText(this);
-                    shrine.setEntry(this.slot, entry);
-                }
-            }
+//            if(((MultiblockCacheI) world).drunk_server_toolkit$getStructure(coreUuid) instanceof ShrineMultiblock shrine) {
+//                ShrineMultiblock.PedestalEntry entry = shrine.getEntry(this.slot).orElse(new ShrineMultiblock.PedestalEntry(null, null, null));
+//                if(entry.textEntity() == null) {
+//                    entry = entry.withText(this);
+//                    shrine.setEntry(this.slot, entry);
+//                }
+//            }
         }
 
         @Override
         public DisplayEntity.TextDisplayEntity create(MultiblockStructure structure, BlockPos center, Vec3d relative, SpawnReason reason) {
-            DisplayEntity.TextDisplayEntity ret = super.create(structure, center, relative, reason);
+            DisplayEntity.TextDisplayEntity ret = super.create(structure, center, relative.add(0,2.25,0), reason);
             ret.getComponent(Incantatium.PEDESTAL_TEXT_COMPONENT_KEY).initialize(this);
             ret.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
             ret.setDisplayWidth(100);
@@ -281,30 +288,31 @@ public abstract class PedestalEntity<E extends Entity, T extends PedestalEntity<
         @Override
         public void onInteract(PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
             Optional<ShrineMultiblock.PedestalEntry> entry = getEntry();
-            entry.ifPresent(p -> p.itemEntity().onInteract(user, hand, cir));
+            entry.flatMap(ShrineMultiblock.PedestalEntry::item).ifPresentOrElse(e -> e.onInteract(user, hand, cir), () -> Incantatium.LOGGER.info("couldnt find item"));
         }
 
         @Override
         public void handleAttack(Entity attacker, CallbackInfoReturnable<Boolean> cir) {
             Optional<ShrineMultiblock.PedestalEntry> entry = getEntry();
-            entry.ifPresent(p -> p.itemEntity().handleAttack(attacker, cir));
+            entry.flatMap(ShrineMultiblock.PedestalEntry::item).ifPresent(e -> e.handleAttack(attacker, cir));
         }
 
         @Override
         public void initializeFromData(InteractionEntity entity) {
             super.initializeFromData(entity);
-            if(((MultiblockCacheI) world).drunk_server_toolkit$getStructure(coreUuid) instanceof ShrineMultiblock shrine) {
-                ShrineMultiblock.PedestalEntry entry = shrine.getEntry(this.slot).orElse(new ShrineMultiblock.PedestalEntry(null, null, null));
-                if(entry.interactionEntity() == null) {
-                    entry = entry.withInteraction(this);
-                    shrine.setEntry(this.slot, entry);
-                }
-            }
+//            if(((MultiblockCacheI) world).drunk_server_toolkit$getStructure(coreUuid) instanceof ShrineMultiblock shrine) {
+//                ShrineMultiblock.PedestalEntry entry = shrine.getEntry(this.slot).orElse(new ShrineMultiblock.PedestalEntry(null, null, null));
+//                if(entry.interactionEntity() == null) {
+//                    entry = entry.withInteraction(this);
+//                    shrine.setEntry(this.slot, entry);
+//                }
+//            }
         }
 
         @Override
         public InteractionEntity create(MultiblockStructure structure, BlockPos center, Vec3d relative, SpawnReason reason) {
             InteractionEntity ret = super.create(structure, center, relative, reason);
+            ret.getComponent(Incantatium.PEDESTAL_INTERACTION_COMPONENT_KEY).initialize(this);
             ret.setInteractionHeight(1.5f);
             ret.setInteractionWidth(1);
             ret.setResponse(true);

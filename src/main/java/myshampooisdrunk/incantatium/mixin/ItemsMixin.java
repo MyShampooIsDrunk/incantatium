@@ -14,6 +14,7 @@ public class ItemsMixin {
     private static FoodComponent getRealGodApple(FoodComponent foodComponent){
         return Incantatium.MOD_GOD_APPLE;
     }
+
     @ModifyArg(method = "<clinit>", at=@At(value="INVOKE",target = "Lnet/minecraft/item/Item$Settings;food(Lnet/minecraft/component/type/FoodComponent;Lnet/minecraft/component/type/ConsumableComponent;)Lnet/minecraft/item/Item$Settings;",ordinal = 1))
     private static ConsumableComponent getRealGodAppleEffects(ConsumableComponent consumableComponent){
         return Incantatium.MOD_GOD_APPLE_EFFECTS;

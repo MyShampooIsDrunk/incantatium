@@ -2,12 +2,16 @@ package myshampooisdrunk.incantatium;
 
 import com.mojang.datafixers.util.Either;
 import myshampooisdrunk.drunk_server_toolkit.DST;
+import myshampooisdrunk.incantatium.block.dispenser.BundleDispenserBehavior;
+import myshampooisdrunk.incantatium.command.BalanceCommand;
 import myshampooisdrunk.incantatium.component.*;
 import myshampooisdrunk.incantatium.registry.IncantatiumRegistry;
 import myshampooisdrunk.incantatium.util.SoulboundHelper;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.minecraft.block.DispenserBlock;
 import net.minecraft.component.type.ConsumableComponent;
 import net.minecraft.component.type.ConsumableComponents;
 import net.minecraft.component.type.CustomModelDataComponent;
@@ -17,6 +21,7 @@ import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.item.BundleItem;
 import net.minecraft.item.consume.ApplyEffectsConsumeEffect;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -65,19 +70,24 @@ public class Incantatium implements ModInitializer {
 			id("pedestal_text"), PedestalTextDisplay.class);
 	public static final ComponentKey<PedestalInteraction> PEDESTAL_INTERACTION_COMPONENT_KEY = ComponentRegistry.getOrCreate(
 			id("pedestal_interaction"), PedestalInteraction.class);
+	public static final ComponentKey<PlayerBankAccount> PLAYER_BANK_ACCOUNT_COMPONENT_KEY = ComponentRegistry.getOrCreate(
+			id("bank"), PlayerBankAccount.class);
 
 	@Override
 	public void onInitialize() {
 		ServerPlayerEvents.COPY_FROM.register(SoulboundHelper::copySoulBoundItems);
+		CommandRegistrationCallback.EVENT.register((d,r,e) -> {
+			BalanceCommand.register(d);
+		});
 		IncantatiumRegistry.init();
 		DST.initializeCommands();
+		for (BundleItem bundle : BundleItem.getBundles()) {
+			DispenserBlock.registerBehavior(bundle, new BundleDispenserBehavior());
+		}
+
 	}
 	public static Identifier id(String path){
 		return Identifier.of("incantatium", path);
-	}
-
-	public static Either<CustomModelDataComponent, Identifier> getModel(String modelId){
-		return Either.left(new CustomModelDataComponent(List.of(), List.of(), List.of(modelId), List.of()));
 	}
 
 	public static Either<CustomModelDataComponent, Identifier> getModel(Identifier path){

@@ -1,2 +1,6 @@
 {
+  "model": {
+    "type": "minecraft:model",
+    "model": "incantatium:item/ornament/constitution_ornament"
+  }
 }

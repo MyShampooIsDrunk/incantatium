@@ -40,7 +40,7 @@ public class SichotianAppleItem extends AbstractRecipeItem<CraftingRecipeInput> 
                     )
             )).consumeSeconds(0.8f).build();
     public SichotianAppleItem() {
-        super(Items.GOLDEN_APPLE, Identifier.of(Incantatium.LOGGER.getName(),"sichotian_apple"), "incantatium.sichotian_apple.name", Incantatium.getModel(Incantatium.id("sichotian_apple")));
+        super(Items.GOLDEN_APPLE, Incantatium.id("sichotian_apple"), "incantatium.sichotian_apple.name", Incantatium.getModel(Incantatium.id("sichotian_apple")));
 
         addComponent(DataComponentTypes.FOOD, SICHOTIAN_APPLE_HUNGER);
         addComponent(DataComponentTypes.CONSUMABLE, SICHOTIAN_APPLE_EFFECTS);

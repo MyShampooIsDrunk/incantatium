@@ -5,15 +5,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.recipe.RecipeInputProvider;
 import net.minecraft.recipe.input.RecipeInput;
 
-public interface MultiblockRecipeInput extends Inventory, RecipeInputProvider, RecipeInput {
-    default boolean isEmpty() {
-        for (int i = 0; i < this.size(); i++) {
-            if (!this.getStackInSlot(i).isEmpty()) {
-                return false;
-            }
-        }
-        return true;
-    }
+public interface MultiblockRecipeInput extends RecipeInputProvider, RecipeInput {
 
     MultiblockInventory.Entry getEntryInSlot(int slot);
 

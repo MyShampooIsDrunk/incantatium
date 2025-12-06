@@ -22,6 +22,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -45,12 +46,6 @@ public class EnduranceOrnamentItem extends AbstractOrnamentItem{
 
     public EnduranceOrnamentItem() {
         super(Incantatium.id("endurance_ornament"), "Endurance", (int) (SHIELD_COOLDOWN_MULTIPLITER * 100), false);
-        addComponent(DataComponentTypes.BLOCKS_ATTACKS, new BlocksAttacksComponent(0.25F, SHIELD_COOLDOWN_MULTIPLITER,
-                List.of(new BlocksAttacksComponent.DamageReduction(90.0F, Optional.empty(), 0.0F, 1.0F)),
-                new BlocksAttacksComponent.ItemDamage(0, 0, 0),
-                Optional.of(DamageTypeTags.BYPASSES_SHIELD),
-                Optional.of(SoundEvents.ITEM_SHIELD_BLOCK),
-                Optional.of(SoundEvents.ITEM_SHIELD_BREAK)));
 
         addComponent(DataComponentTypes.USE_COOLDOWN, new UseCooldownComponent(0.0001f, Optional.of(Incantatium.id("ornament_cooldown"))));
     }
@@ -72,36 +67,61 @@ public class EnduranceOrnamentItem extends AbstractOrnamentItem{
         BlocksAttacksComponent blocksAttacksComponent = stack != null ? stack.get(DataComponentTypes.BLOCKS_ATTACKS) : null;
         float f = attacker.getWeaponDisableBlockingForSeconds();
 
-        Vec3d diff = EntityAnchorArgumentType.EntityAnchor.FEET.positionAt(attacker).subtract(user.getEntityPos()).add(0,1,0);
-        Vec3d rot = diff.normalize();
-        attacker.setVelocity(rot);
-        attacker.velocityDirty = true;
-        attacker.velocityModified = true;
+        Vec3d rot = EntityAnchorArgumentType.EntityAnchor.FEET.positionAt(attacker).subtract(user.getEntityPos()).normalize().multiply(0.3).add(0,0.25,0);
+
 
         if (f > 0.0F && blocksAttacksComponent != null && user instanceof PlayerEntity p) {
             p.getComponent(Incantatium.ENDURANCE_COMPONENT_KEY).activate(100);
-            stack.set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.builder().add(EntityAttributes.KNOCKBACK_RESISTANCE,
-                    new EntityAttributeModifier(this.identifier, 0.6, EntityAttributeModifier.Operation.ADD_VALUE),
-                    AttributeModifierSlot.OFFHAND).build());//TODO: fix ts
             attacker.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 100, 0));
             cooldownItems(p);
+            ItemStack shield = Items.SHIELD.getDefaultStack();
+            BlocksAttacksComponent b = shield != null ? shield.get(DataComponentTypes.BLOCKS_ATTACKS) : null;
+            if(b != null) b.applyShieldCooldown(world, p, f, shield);
+            rot = rot.multiply(2);
         }
+
+        attacker.setVelocity(rot);
+        attacker.velocityDirty = true;
+        attacker.velocityModified = true;
     }
 
     @Override
     public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, EquipmentSlot slot, CallbackInfo ci) {
-        super.inventoryTick(stack, world, entity, slot, ci);
-        if(entity instanceof ServerPlayerEntity p && !world.isClient()){
+//        super.inventoryTick(stack, world, entity, slot, ci);
+        if(entity instanceof PlayerEntity player) {
+            OrnamentAbilities abilities = player.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY);
 
-            EnduranceEffect effect = p.getComponent(Incantatium.ENDURANCE_COMPONENT_KEY);
-            if(effect.getActive() && effect.getTicks() == 0) {
-                stack.set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT);
+            if(abilities.isActive(identifier)) {
+                if(!Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
+                    stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+                    player.currentScreenHandler.sendContentUpdates();
+                }
+            }
+            else if(!abilities.isActive(identifier) && Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
+                stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, false);
+                player.currentScreenHandler.sendContentUpdates();
+            }
+
+            if(slot != null)
+                if(slot.equals(EquipmentSlot.OFFHAND) && !stack.contains(DataComponentTypes.BLOCKS_ATTACKS))
+                    stack.set(DataComponentTypes.BLOCKS_ATTACKS, new BlocksAttacksComponent(0.25F, SHIELD_COOLDOWN_MULTIPLITER,
+                            List.of(new BlocksAttacksComponent.DamageReduction(90.0F, Optional.empty(), 0.0F, 1.0F)),
+                            new BlocksAttacksComponent.ItemDamage(0, 0, 0),
+                            Optional.of(DamageTypeTags.BYPASSES_SHIELD),
+                            Optional.of(SoundEvents.ITEM_SHIELD_BLOCK),
+                            Optional.of(SoundEvents.ITEM_SHIELD_BREAK)));
+                else if(!slot.equals(EquipmentSlot.OFFHAND) && stack.contains(DataComponentTypes.BLOCKS_ATTACKS))
+                    stack.remove(DataComponentTypes.BLOCKS_ATTACKS);
+
+            switch(player.getComponent(Incantatium.ENDURANCE_COMPONENT_KEY).getTicks()) {
+                case 99:
+                    stack.set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.builder().add(EntityAttributes.KNOCKBACK_RESISTANCE,
+                            new EntityAttributeModifier(this.identifier, 0.25, EntityAttributeModifier.Operation.ADD_VALUE),
+                            AttributeModifierSlot.OFFHAND).build());
+                    break;
+                case 0:
+                    stack.remove(DataComponentTypes.ATTRIBUTE_MODIFIERS);
             }
         }
-        //if(player.getEntityWorld() instanceof ServerWorld sw) {
-        //            linkedStack = player.getBlockingItem();
-        //            AttributeModifiersComponent comp = AttributeModifiersComponent.builder().add(EntityAttributes.KNOCKBACK_RESISTANCE,
-        //                    new EntityAttributeModifier(Incantatium.id))
-        //        }
     }
 }

@@ -6,5 +6,17 @@
     "incantatium.time_stop_sword.cooldown_message":"There are %s second(s) left until you may use this item again",
     "incantatium.broken_armor": "Potion of Broken Armor",
     "incantatium.splash_broken_armor": "Splash Potion of Broken Armor",
-    "incantatium.lingering_broken_armor": "Lingering Potion of Broken Armor"
+    "incantatium.lingering_broken_armor": "Lingering Potion of Broken Armor",
+    "enchantment.incantatium.bulky": "Bulky",
+    "enchantment.incantatium.galloping": "Galloping",
+    "enchantment.incantatium.ravaging": "Ravaging",
+    "enchantment.incantatium.soul_linked": "Soul-Linked",
+    "incantatium.commands.balance.failed.funds": "Insufficient Funds!",
+    "incantatium.copper_coin.name": "Copper Coin",
+    "incantatium.silver_coin.name": "Silver Coin",
+    "incantatium.gold_coin.name": "Gold Coin",
+    "incantatium.netherite_coin.name": "Netherite Coin",
+    "incantatium.bank.deposit": "Deposited $%s Successfully!",
+    "incantatium.bank.withdraw": "Withdrew $%s Successfully!"
+
 }

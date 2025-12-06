@@ -63,7 +63,6 @@ public class MultiblockInventory implements MultiblockRecipeInput {
         return slot >= 0 && slot < this.heldStacks.size() ? this.heldStacks.get(slot) : EMPTY;
     }
 
-    @Override
     public ItemStack getStack(int slot) {
         return getStackInSlot(slot);
     }
@@ -76,7 +75,6 @@ public class MultiblockInventory implements MultiblockRecipeInput {
         return slot >= 0 && slot < this.heldStacks.size() ? this.heldStacks.get(slot) : EMPTY;
     }
 
-    @Override
     public ItemStack removeStack(int slot, int amount) {
 //        System.out.println("I am " + this + " and im trying to remove " + amount);
         if(slot < 0 || slot >= this.heldStacks.size()) return ItemStack.EMPTY;
@@ -91,7 +89,6 @@ public class MultiblockInventory implements MultiblockRecipeInput {
         return e.stack.copyWithCount(amount);
     }
 
-    @Override
     public ItemStack removeStack(int slot) {
         if(slot < 0 || slot >= this.heldStacks.size()) return ItemStack.EMPTY;
         Singleton e = this.heldStacks.get(slot);
@@ -99,7 +96,6 @@ public class MultiblockInventory implements MultiblockRecipeInput {
         return removeStack(slot, e.stack.getMaxCount());
     }
 
-    @Override
     public void setStack(int slot, ItemStack stack) {
         if(slot < 0 || slot >= this.heldStacks.size()) return;
         this.heldStacks.set(slot, new Singleton(stack, stack.getCount()));
@@ -137,16 +133,13 @@ public class MultiblockInventory implements MultiblockRecipeInput {
         return false;
     }
 
-    @Override
     public void markDirty() {
     }
 
-    @Override
     public boolean canPlayerUse(PlayerEntity player) {
         return false;
     }
 
-    @Override
     public void clear() {
         this.heldStacks.clear();
     }

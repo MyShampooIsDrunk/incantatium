@@ -41,6 +41,6 @@ public class PedestalTextDisplay implements PedestalDisplay<DisplayEntity.TextDi
 
     @Override
     public void writeData(WriteView writeView) {
-        if(slot != -1) writeView.putInt("slot",slot);
+        if(slot != -1) writeView.putInt("slot", slot);
     }
 }

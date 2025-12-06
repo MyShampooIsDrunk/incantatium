@@ -27,7 +27,7 @@ public class ShapelessMultiblockRecipe extends AbstractMultiblockRecipe {
             if(input.getEntryInSlot(i).isEmpty()) continue;
             boolean temp = false;
             for (MultiblockEntryIngredient ingredient : ingredients) {
-                System.out.println("checking ingredient + entry " + input.getEntryInSlot(i));
+//                System.out.println("checking ingredient + entry " + input.getEntryInSlot(i));
                 if(!remaining.contains(ingredient)) continue;
                 if(ingredient.test(input.getEntryInSlot(i))) {
                     temp = true;

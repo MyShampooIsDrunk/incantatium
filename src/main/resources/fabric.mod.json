@@ -16,7 +16,8 @@
 			"incantatium:inventory_storage",
 			"incantatium:pedestal_storage",
 			"incantatium:pedestal_text",
-			"incantatium:pedestal_interaction"
+			"incantatium:pedestal_interaction",
+			"incantatium:bank"
 		]
 	},
 	"contact": {

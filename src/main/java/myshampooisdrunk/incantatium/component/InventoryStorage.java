@@ -1,5 +1,6 @@
 package myshampooisdrunk.incantatium.component;
 
+import myshampooisdrunk.incantatium.multiblock.ShrineMultiblock;
 import myshampooisdrunk.incantatium.multiblock.inventory.MultiblockInventory;
 import net.minecraft.item.ItemStack;
 import org.ladysnake.cca.api.v3.component.Component;
@@ -9,6 +10,10 @@ public interface InventoryStorage extends ServerTickingComponent {
 
     MultiblockInventory getInventory();
 
+    ShrineMultiblock.PedestalEntry[] getPedestals();
+
+    void copyPedestals(ShrineMultiblock.PedestalEntry[] pedestals);
+
     default MultiblockInventory.Singleton getStack(int slot) {
         return getInventory().get(slot);
     }
@@ -16,6 +21,8 @@ public interface InventoryStorage extends ServerTickingComponent {
     default void setSlot(MultiblockInventory.Singleton singleton, int slot) {
         getInventory().set(singleton, slot);
     }
+
+    void update();
 
     void startTimer();
 

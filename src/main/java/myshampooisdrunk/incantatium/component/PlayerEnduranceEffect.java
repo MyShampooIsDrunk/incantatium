@@ -31,7 +31,7 @@ public class PlayerEnduranceEffect implements EnduranceEffect{
 
     @Override
     public void activate(int ticks) {
-        Incantatium.LOGGER.info("ACTIVATED!!!!");
+//        Incantatium.LOGGER.info("ACTIVATED!!!!");
         this.tick = ticks;
         if(player.getEntityWorld() instanceof ServerWorld sw)
             sw.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1.5f, 2.5f);

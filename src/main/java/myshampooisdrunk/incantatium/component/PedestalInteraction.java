@@ -29,6 +29,6 @@ public class PedestalInteraction implements PedestalDisplay<InteractionEntity, P
 
     @Override
     public void writeData(WriteView writeView) {
-        if(slot != -1) writeView.putInt("slot",slot);
+        if(slot != -1) writeView.putInt("slot", slot);
     }
 }

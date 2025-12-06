@@ -21,5 +21,6 @@ public class IncantatiumComponentRegistry implements EntityComponentInitializer 
         registry.registerFor(DisplayEntity.ItemDisplayEntity.class, Incantatium.PEDESTAL_STORAGE_COMPONENT_KEY, PedestalInventoryStorage::new);
         registry.registerFor(DisplayEntity.TextDisplayEntity.class, Incantatium.PEDESTAL_TEXT_COMPONENT_KEY, PedestalTextDisplay::new);
         registry.registerFor(InteractionEntity.class, Incantatium.PEDESTAL_INTERACTION_COMPONENT_KEY, PedestalInteraction::new);
+        registry.registerFor(PlayerEntity.class, Incantatium.PLAYER_BANK_ACCOUNT_COMPONENT_KEY, PlayerBankAccount::new);
     }
 }

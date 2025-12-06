@@ -1,0 +1,45 @@
+{
+  "anvil_cost": 4,
+  "description": {
+    "translate": "enchantment.incantatium.ravaging"
+  },
+  "effects": {
+    "minecraft:attributes": [
+      {
+        "amount": {
+          "type": "minecraft:linear",
+          "base": 0.1,
+          "per_level_above_first": 0.1
+        },
+        "attribute": "minecraft:jump_strength",
+        "id": "incantatium:ravaging_jump_height",
+        "operation": "add_value"
+      },
+      {
+        "amount": {
+          "type": "minecraft:linear",
+          "base": 10.0,
+          "per_level_above_first": 10.0
+        },
+        "attribute": "minecraft:safe_fall_distance",
+        "id": "incantatium:ravaging_safe_fall_distance",
+        "operation": "add_value"
+      }
+    ]
+  },
+  "max_cost": {
+    "base": 75,
+    "per_level_above_first": 25
+  },
+  "max_level": 3,
+  "min_cost": {
+    "base": 25,
+    "per_level_above_first": 25
+  },
+  "slots": [
+    "body"
+  ],
+  "supported_items": "#incantatium:enchantable/horse_armor",
+  "weight": 2,
+  "exclusive_set": "#incantatium:exclusive_set/horse_armor_ability"
+}

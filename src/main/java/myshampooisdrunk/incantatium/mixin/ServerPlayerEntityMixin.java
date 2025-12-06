@@ -23,17 +23,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
-    @Shadow public abstract ServerWorld getEntityWorld();
-
-    @Inject(method="onDeath",at=@At("HEAD"))
-    public void updateCache(DamageSource damageSource, CallbackInfo ci){
-        ServerChunkTickManager man = ((ServerChunkTickManagerInterface) getEntityWorld().getServer()).getServerChunkTickManager();
-        for(ServerChunkTickManager.ChunkTickManager chunk : man.getChunks()){
-            if(chunk.getPlayerCache().containsKey(this.getUuidAsString())){
-                chunk.untrackPlayer(this);
-            }
-        }
-    }
+//    @Shadow public abstract ServerWorld getEntityWorld();
+//
+//    @Inject(method="onDeath",at=@At("HEAD"))
+//    public void updateCache(DamageSource damageSource, CallbackInfo ci){
+//        ServerChunkTickManager man = ((ServerChunkTickManagerInterface) getEntityWorld().getServer()).getServerChunkTickManager();
+//        for(ServerChunkTickManager.ChunkTickManager chunk : man.getChunks()){
+//            if(chunk.getPlayerCache().containsKey(this.getUuidAsString())){
+//                chunk.untrackPlayer(this);
+//            }
+//        }
+//    }
 
 //    @Inject(method = "attack", at=@At("HEAD"), cancellable = true)
 //    public void dontAttackIfEndurance(Entity target, CallbackInfo ci){

@@ -1,0 +1,55 @@
+{
+  "anvil_cost": 2,
+  "description": {
+    "translate": "enchantment.minecraft.density"
+  },
+  "effects": {
+    "minecraft:smash_damage_per_fallen_block": [
+      {
+        "effect": {
+          "type": "minecraft:all_of",
+          "effects": [
+            {
+              "type": "minecraft:add",
+              "value": {
+                "type": "minecraft:fraction",
+                "numerator": {
+                  "type": "minecraft:levels_squared",
+                  "added": 0
+                },
+                "denominator": 32
+              }
+            },
+            {
+              "type": "minecraft:add",
+              "value": {
+                "type": "minecraft:fraction",
+                "numerator": {
+                  "type": "minecraft:linear",
+                  "base": 3,
+                  "per_level_above_first": 9
+                },
+                "denominator": 32
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "exclusive_set": "#minecraft:exclusive_set/damage",
+  "max_cost": {
+    "base": 35,
+    "per_level_above_first": 8
+  },
+  "max_level": 3,
+  "min_cost": {
+    "base": 15,
+    "per_level_above_first": 8
+  },
+  "slots": [
+    "mainhand"
+  ],
+  "supported_items": "#minecraft:enchantable/mace",
+  "weight": 5
+}
