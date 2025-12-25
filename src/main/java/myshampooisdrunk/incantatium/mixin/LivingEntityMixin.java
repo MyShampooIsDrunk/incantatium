@@ -11,6 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.SideShapeType;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DeathProtectionComponent;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttribute;
@@ -19,6 +20,8 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.MaceItem;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryKeys;
@@ -31,6 +34,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.*;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -40,6 +44,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static net.minecraft.entity.effect.StatusEffects.*;
@@ -65,6 +70,8 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Shadow public abstract double getAttributeValue(RegistryEntry<EntityAttribute> attribute);
 
+    @Shadow public abstract @Nullable ItemStack getBlockingItem();
+
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
     }
@@ -85,15 +92,16 @@ public abstract class LivingEntityMixin extends Entity {
         if(this.getEntityWorld() instanceof ServerWorld world && height >= 7 && this.hasControllingPassenger() && this.hasStackEquipped(EquipmentSlot.BODY) &&
                 this.getEquippedStack(EquipmentSlot.BODY).getEnchantments().getEnchantments()
                         .contains(world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(IncantatiumRegistry.RAVAGING))) {
-
+            int level = this.getEquippedStack(EquipmentSlot.BODY).getEnchantments().getLevel(world.getRegistryManager()
+                    .getOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(IncantatiumRegistry.RAVAGING));
             height -= RAVAGING_HEIGHT_OFFSET;
 
             double radius = 1;
-            double damage = 4 * Math.min(height, 12);
+            double damage = (level + 1) * Math.min(height, 12);
             height -= Math.min(height, 12);
 
             if(height > 0) {
-                damage += 2 * Math.min(height, 14);
+                damage += (level + 1) / 2d * Math.min(height, 14);
                 height -= Math.min(height, 14);
                 radius += 0.5;
             }
@@ -186,6 +194,15 @@ public abstract class LivingEntityMixin extends Entity {
             }
         });
         if(bl.get()) instance.decrement(amount);
+    }
+
+    @Inject(method = "takeShieldHit", at = @At("HEAD"))
+    public void injectDisableMace(ServerWorld world, LivingEntity attacker, CallbackInfo ci) {
+        if(attacker.getWeaponStack().isOf(Items.MACE) && attacker instanceof PlayerEntity p && MaceItem.shouldDealAdditionalDamage(p)) {
+            p.getItemCooldownManager().set(p.getWeaponStack(), 300);
+            world.playSound(null, attacker.getX(), attacker.getY(), attacker.getZ(), SoundEvents.BLOCK_NOTE_BLOCK_BELL, SoundCategory.PLAYERS, 1.5f ,0.5f);
+            Objects.requireNonNull(Objects.requireNonNull(this.getBlockingItem()).get(DataComponentTypes.BLOCKS_ATTACKS)).applyShieldCooldown(world, dis, 7.5f, this.getBlockingItem());
+        }
     }
 
 }

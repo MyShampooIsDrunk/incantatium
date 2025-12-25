@@ -6,7 +6,7 @@ import myshampooisdrunk.incantatium.block.dispenser.BundleDispenserBehavior;
 import myshampooisdrunk.incantatium.command.BalanceCommand;
 import myshampooisdrunk.incantatium.component.*;
 import myshampooisdrunk.incantatium.registry.IncantatiumRegistry;
-import myshampooisdrunk.incantatium.util.SoulboundHelper;
+import myshampooisdrunk.incantatium.util.PostDeathHelper;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -20,7 +20,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.BundleItem;
 import net.minecraft.item.consume.ApplyEffectsConsumeEffect;
 import net.minecraft.registry.RegistryKey;
@@ -36,7 +35,7 @@ import java.util.List;
 
 public class Incantatium implements ModInitializer {
 
-	public static final boolean DEV_MODE = true;
+	public static final boolean DEV_MODE = false;
 
     public static final Logger LOGGER = LoggerFactory.getLogger("incantatium");
 
@@ -75,7 +74,9 @@ public class Incantatium implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		ServerPlayerEvents.COPY_FROM.register(SoulboundHelper::copySoulBoundItems);
+		ServerPlayerEvents.COPY_FROM.register(PostDeathHelper::copyBankAccount);
+		ServerPlayerEvents.COPY_FROM.register(PostDeathHelper::copySoulBoundItems);
+		ServerPlayerEvents.AFTER_RESPAWN.register(PostDeathHelper::damageOrnament);
 		CommandRegistrationCallback.EVENT.register((d,r,e) -> {
 			BalanceCommand.register(d);
 		});

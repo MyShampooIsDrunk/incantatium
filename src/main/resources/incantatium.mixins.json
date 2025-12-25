@@ -3,20 +3,24 @@
   "package": "myshampooisdrunk.incantatium.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "BeaconBlockEntityMixin",
     "BundleContentsComponentMixin",
     "DispenserBlockInvoker",
+    "EntityEquipmentMixin",
     "EntityMixin",
     "HappyGhastEntityMixin",
     "InteractionEntityMixin",
     "Item$SettingsMixin",
     "ItemsMixin",
     "LivingEntityMixin",
+    "MaceItemMixin",
     "PlayerInventoryMixin",
     "ScoreboardMixin",
     "ServerPlayerEntityMixin",
     "ServerPlayerInteractionManagerMixin",
     "StatusEffectsMixin",
-    "TridentItemMixin"
+    "TridentItemMixin",
+    "TripwireHookBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

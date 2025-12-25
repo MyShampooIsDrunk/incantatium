@@ -1,6 +1,8 @@
 package myshampooisdrunk.incantatium.items.ornaments;
 
 import myshampooisdrunk.incantatium.Incantatium;
+import myshampooisdrunk.incantatium.multiblock.recipe.AbstractMultiblockRecipe;
+import myshampooisdrunk.incantatium.multiblock.recipe.ShapelessMultiblockRecipe;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.LivingEntity;
@@ -10,6 +12,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -46,5 +49,18 @@ public class ConstitutionOrnamentItem extends AbstractOrnamentItem{
         return AttributeModifiersComponent.builder().add(EntityAttributes.MAX_HEALTH,
                 new EntityAttributeModifier(this.identifier, 10, EntityAttributeModifier.Operation.ADD_VALUE),
                 AttributeModifierSlot.OFFHAND).build();
+    }
+
+    @Override
+    public AbstractMultiblockRecipe recipe() {
+        return new ShapelessMultiblockRecipe(this.create())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.NETHER_STAR, 4).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.ENCHANTED_GOLDEN_APPLE, 6).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.DIAMOND_BLOCK, 32).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.GOLDEN_APPLE, 128).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.HONEY_BLOCK, 64).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.CRYING_OBSIDIAN, 64).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.REDSTONE_BLOCK, 128).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.GLISTERING_MELON_SLICE, 256).build());
     }
 }

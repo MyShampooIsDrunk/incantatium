@@ -1,6 +1,8 @@
 package myshampooisdrunk.incantatium.items.ornaments;
 
 import myshampooisdrunk.incantatium.Incantatium;
+import myshampooisdrunk.incantatium.multiblock.recipe.AbstractMultiblockRecipe;
+import myshampooisdrunk.incantatium.multiblock.recipe.ShapelessMultiblockRecipe;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.LivingEntity;
@@ -10,6 +12,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -42,5 +45,18 @@ public class HydrousOrnamentItem extends AbstractOrnamentItem{
         return AttributeModifiersComponent.builder().add(EntityAttributes.WATER_MOVEMENT_EFFICIENCY,
                 new EntityAttributeModifier(this.identifier, 0.1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE),
                 AttributeModifierSlot.OFFHAND).build();
+    }
+
+    @Override
+    public AbstractMultiblockRecipe recipe() {
+        return new ShapelessMultiblockRecipe(this.create())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.TRIDENT, 4).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.CONDUIT, 1).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.SPONGE, 32).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.TIDE_ARMOR_TRIM_SMITHING_TEMPLATE, 16).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.TURTLE_SCUTE, 64).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.NAUTILUS_SHELL, 64).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.SEA_LANTERN, 128).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.GOLD_BLOCK, 256).build());
     }
 }

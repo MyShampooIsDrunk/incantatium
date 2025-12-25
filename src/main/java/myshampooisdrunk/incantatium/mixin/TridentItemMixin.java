@@ -44,7 +44,7 @@ public class TridentItemMixin {
 
         if(!instance.getEntityWorld().isClient()){
             instance.sendMessage(Text.literal("RIPTIDE IS ON COOLDOWN: " +
-                    (cooldown.getCooldown() - cooldown.getLastUse()+19)/20 + " SECONDS REMAINING").setStyle(
+                    (cooldown.getCooldown() - cooldown.getLastUse() + 19)/20 + " SECONDS REMAINING").setStyle(
                     Style.EMPTY.withColor(Colors.LIGHT_RED)
             ), true);
         }
@@ -79,14 +79,14 @@ public class TridentItemMixin {
 //                p.getItemCooldownManager().set(stack, 100 * (1 + max - cooldown.get()) + (100 * (int) Math.clamp(4 - f / 0.75f, 0, 2)));
             }//5s less per lvl of riptide but also 5s less per charge
             else {
-                cooldown.setCooldown(0);
+                cooldown.setCooldown(1);
             }
-            if(cooldown.useRiptide(stack)){
+            if(cooldown.useRiptide(stack)) {
 //                System.out.println("velocity pre mod: " + p.getVelocity());
 //                System.out.println("set user velocity");
                 p.addVelocity(j, k, l);
 //                System.out.println("velocity after: " + p.getVelocity());
-                p.useRiptide(20, (float) (6 * f + p.getAttributeValue(EntityAttributes.ATTACK_DAMAGE) - 1), stack);
+                p.useRiptide(20, 6 * f, stack);
                 if (p.isOnGround()) {
                     p.move(MovementType.SELF, new Vec3d(0.0, 1.1999999F, 0.0));
                 }
@@ -98,11 +98,11 @@ public class TridentItemMixin {
                     user.damage(
                             sWorld,
                             new DamageSource(user.getRegistryManager().getOrThrow(RegistryKeys.DAMAGE_TYPE).getOrThrow(Incantatium.TRIDENT_BYPASS), user),
-                            Math.clamp(10f - 8f * f/3f, 0, 10)
+                            Math.clamp(7 + 2f/3f * f - 8f/9f * f * f, 0, 10)
                     );
                 }
                 user.velocityModified = true;
-            } else{
+            } else {
                 System.out.println("player couldn't use riptide");
             }
         }
@@ -114,8 +114,8 @@ public class TridentItemMixin {
     private float modifyDamage(float riptideAttackDamage, @Local(argsOnly = true) ItemStack stack, @Local PlayerEntity playerEntity){
         playerEntity.velocityModified = true;
         float f = EnchantmentHelper.getTridentSpinAttackStrength(stack, playerEntity);
-        return (float) (6 * f + playerEntity.getAttributeValue(EntityAttributes.ATTACK_DAMAGE) - 1);
-        //riptide 1 -> 8 dmg | r2 -> 13.5 dmg | r3 -> 18 dmg
+        return 6 * f;
+        //riptide 1 -> 9 dmg | r2 -> 13.5 dmg | r3 -> 18 dmg
     }
 }
 //3 -> 2; 2 -> 4; 1 -> 6: 6 - 8r/3

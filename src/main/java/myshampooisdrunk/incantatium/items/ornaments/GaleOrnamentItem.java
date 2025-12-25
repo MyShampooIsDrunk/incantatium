@@ -1,22 +1,28 @@
 package myshampooisdrunk.incantatium.items.ornaments;
 
 import myshampooisdrunk.incantatium.Incantatium;
-import myshampooisdrunk.incantatium.component.EnduranceEffect;
+import myshampooisdrunk.incantatium.multiblock.recipe.AbstractMultiblockRecipe;
+import myshampooisdrunk.incantatium.multiblock.recipe.ShapelessMultiblockRecipe;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.EnchantmentLevelEntry;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 public class GaleOrnamentItem extends AbstractOrnamentItem{
     public GaleOrnamentItem() {
@@ -56,5 +62,21 @@ public class GaleOrnamentItem extends AbstractOrnamentItem{
         return AttributeModifiersComponent.builder().add(EntityAttributes.FALL_DAMAGE_MULTIPLIER,
                 new EntityAttributeModifier(this.identifier, -1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
                 AttributeModifierSlot.OFFHAND).build();
+    }
+
+    @Override
+    public AbstractMultiblockRecipe recipe() {
+
+        return new ShapelessMultiblockRecipe(this.create())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addStack(
+                        AbstractMultiblockRecipe.IngredientProvider.enchantedBook(Enchantments.WIND_BURST, 3), 2).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addStack(
+                        AbstractMultiblockRecipe.IngredientProvider.enchantedBook(Enchantments.SWIFT_SNEAK, 3), 2).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.HEAVY_CORE, 2).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.BREEZE_ROD, 128).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.COBWEB, 128).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.AMETHYST_BLOCK, 128).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.BLUE_ICE, 256).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.FEATHER, 256).build());
     }
 }

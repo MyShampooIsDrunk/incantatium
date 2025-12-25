@@ -73,20 +73,20 @@ public class TimeStopItem extends AbstractCustomItem {
         if(user instanceof PlayerEntity player) {
             if(!((CustomItemCooldownManagerI)user).drunk_server_toolkit$getCustomItemCooldownManager().isCoolingDown("time_stop")){
                 world.playSound(null,user.getBlockPos().up(), SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS,1f,1.5f);
-                MinecraftServer server = world.getServer();
-                ServerChunkTickManager man = ((ServerChunkTickManagerInterface) Objects.requireNonNull(server)).getServerChunkTickManager();
-                ServerChunkTickManager.ChunkTickManager chunkMan = man.createManager("time_stop");
-                for(int dx = -1; dx <=1; dx++){
-                    for(int dz = -1; dz <=1; dz++){
-                        chunkMan = chunkMan.addChunk(world.getWorldChunk(user.getBlockPos().add(dx * 16, 0, dz * 16)));
-                    }
-                }
-                man.addChunk(chunkMan);
-                chunkMan.exempt(user);
-                chunkMan.freezeFor(200);
-                ((CustomItemCooldownManagerI)user).drunk_server_toolkit$getCustomItemCooldownManager().set("time_stop",ABILITY_COOLDOWN_TICKS);
-                player.getItemCooldownManager().set(user.getStackInHand(hand), ABILITY_COOLDOWN_TICKS);
-            }else{
+//                MinecraftServer server = world.getServer();
+//                ServerChunkTickManager man = ((ServerChunkTickManagerInterface) Objects.requireNonNull(server)).getServerChunkTickManager();
+//                ServerChunkTickManager.ChunkTickManager chunkMan = man.createManager("time_stop");
+//                for(int dx = -1; dx <=1; dx++){
+//                    for(int dz = -1; dz <=1; dz++){
+//                        chunkMan = chunkMan.addChunk(world.getWorldChunk(user.getBlockPos().add(dx * 16, 0, dz * 16)));
+//                    }
+//                }
+//                man.addChunk(chunkMan);
+//                chunkMan.exempt(user);
+//                chunkMan.freezeFor(200);
+//                ((CustomItemCooldownManagerI)user).drunk_server_toolkit$getCustomItemCooldownManager().set("time_stop",ABILITY_COOLDOWN_TICKS);
+//                player.getItemCooldownManager().set(user.getStackInHand(hand), ABILITY_COOLDOWN_TICKS);
+            } else {
                 player.sendMessage(Text.literal(String.format("There are %s second(s) left until you may use this item again",
                                 (int)(0.95+((CustomItemCooldownManagerI) user).drunk_server_toolkit$getCustomItemCooldownManager()
                                         .getCooldownProgress("time_stop",0)*(ABILITY_COOLDOWN_TICKS/20f))))

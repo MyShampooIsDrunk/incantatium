@@ -3,14 +3,15 @@ package myshampooisdrunk.incantatium.component;
 import myshampooisdrunk.incantatium.items.CoinItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 
 public class PlayerBankAccount implements BankAccount{
     private int coins;
 
-    public PlayerBankAccount(PlayerEntity p) {
-        coins = 0;
+    public PlayerBankAccount(ServerPlayerEntity p) {
+        coins = 500;
     }
 
     @Override
@@ -24,6 +25,11 @@ public class PlayerBankAccount implements BankAccount{
     }
 
     @Override
+    public void setBalance(int coins) {
+        this.coins = coins;
+    }
+
+    @Override
     public ItemStack withdraw(int quantity, CoinItem.CoinType type) {
         if(quantity * type.value() > coins) return ItemStack.EMPTY;
         coins -= quantity * type.value();
@@ -33,7 +39,7 @@ public class PlayerBankAccount implements BankAccount{
 
     @Override
     public void readData(ReadView readView) {
-        coins = readView.getInt("coins", 500);
+        coins = readView.getInt("coins", 0);
     }
 
     @Override

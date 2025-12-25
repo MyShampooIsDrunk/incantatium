@@ -16,6 +16,6 @@
     "body"
   ],
   "supported_items": "#incantatium:enchantable/horse_armor",
-  "weight": 2,
+  "weight": 1,
   "exclusive_set": "#incantatium:exclusive_set/horse_armor_ability"
 }

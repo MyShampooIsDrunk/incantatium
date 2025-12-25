@@ -105,15 +105,19 @@ public class DivineCrownItem extends AbstractCustomArmorItem{
                 Text.literal("Demos: The people around you empower you"),
                 Text.literal("Kratos: You feel stronger by the second")
         );
-        NbtCompound nbt = getCustomNbt();
-        nbt.putBoolean("Soulbound",true);
         addComponent(DataComponentTypes.CUSTOM_NAME, name.setStyle(Style.EMPTY.withItalic(false)));
         addComponent(DataComponentTypes.LORE, new LoreComponent(lore));
         addComponent(DataComponentTypes.MAX_STACK_SIZE, 1);
         addComponent(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
         addComponent(DataComponentTypes.DAMAGE_RESISTANT, new DamageResistantComponent(DamageTypeTags.NO_KNOCKBACK));
-        addComponent(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
         addComponent(DataComponentTypes.EQUIPPABLE, EquippableComponent.builder(EquipmentSlot.HEAD).build());
+    }
+
+    @Override
+    public NbtCompound getCustomNbt() {
+        NbtCompound ret = super.getCustomNbt();
+        ret.putBoolean("soulbound", true);
+        return ret;
     }
 
     @Override

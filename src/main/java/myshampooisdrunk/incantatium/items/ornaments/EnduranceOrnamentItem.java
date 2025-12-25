@@ -5,12 +5,16 @@ import com.google.common.collect.Multimap;
 import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.component.EnduranceEffect;
 import myshampooisdrunk.incantatium.component.OrnamentAbilities;
+import myshampooisdrunk.incantatium.multiblock.recipe.AbstractMultiblockRecipe;
+import myshampooisdrunk.incantatium.multiblock.recipe.ShapelessMultiblockRecipe;
+import myshampooisdrunk.incantatium.registry.IncantatiumRegistry;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.BlocksAttacksComponent;
 import net.minecraft.component.type.UseCooldownComponent;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -25,6 +29,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.DamageTypeTags;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -91,7 +96,15 @@ public class EnduranceOrnamentItem extends AbstractOrnamentItem{
         if(entity instanceof PlayerEntity player) {
             OrnamentAbilities abilities = player.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY);
 
-            if(abilities.isActive(identifier)) {
+            if(abilities.isActive(identifier) && stack.getDamage() < stack.getMaxDamage()) {
+                if(slot != null && slot.equals(EquipmentSlot.OFFHAND) && !stack.contains(DataComponentTypes.BLOCKS_ATTACKS))
+                        stack.set(DataComponentTypes.BLOCKS_ATTACKS, new BlocksAttacksComponent(0.25F, SHIELD_COOLDOWN_MULTIPLITER,
+                                List.of(new BlocksAttacksComponent.DamageReduction(90.0F, Optional.empty(), 0.0F, 1.0F)),
+                                new BlocksAttacksComponent.ItemDamage(0, 0, 0),
+                                Optional.of(DamageTypeTags.BYPASSES_SHIELD),
+                                Optional.of(SoundEvents.ITEM_SHIELD_BLOCK),
+                                Optional.of(SoundEvents.ITEM_SHIELD_BREAK)));
+
                 if(!Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
                     stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
                     player.currentScreenHandler.sendContentUpdates();
@@ -102,16 +115,8 @@ public class EnduranceOrnamentItem extends AbstractOrnamentItem{
                 player.currentScreenHandler.sendContentUpdates();
             }
 
-            if(slot != null)
-                if(slot.equals(EquipmentSlot.OFFHAND) && !stack.contains(DataComponentTypes.BLOCKS_ATTACKS))
-                    stack.set(DataComponentTypes.BLOCKS_ATTACKS, new BlocksAttacksComponent(0.25F, SHIELD_COOLDOWN_MULTIPLITER,
-                            List.of(new BlocksAttacksComponent.DamageReduction(90.0F, Optional.empty(), 0.0F, 1.0F)),
-                            new BlocksAttacksComponent.ItemDamage(0, 0, 0),
-                            Optional.of(DamageTypeTags.BYPASSES_SHIELD),
-                            Optional.of(SoundEvents.ITEM_SHIELD_BLOCK),
-                            Optional.of(SoundEvents.ITEM_SHIELD_BREAK)));
-                else if(!slot.equals(EquipmentSlot.OFFHAND) && stack.contains(DataComponentTypes.BLOCKS_ATTACKS))
-                    stack.remove(DataComponentTypes.BLOCKS_ATTACKS);
+            if((!abilities.isActive(identifier) || stack.getDamage() == stack.getMaxDamage() || (slot != null && !slot.equals(EquipmentSlot.OFFHAND))) && stack.contains(DataComponentTypes.BLOCKS_ATTACKS))
+                stack.remove(DataComponentTypes.BLOCKS_ATTACKS);
 
             switch(player.getComponent(Incantatium.ENDURANCE_COMPONENT_KEY).getTicks()) {
                 case 99:
@@ -123,5 +128,19 @@ public class EnduranceOrnamentItem extends AbstractOrnamentItem{
                     stack.remove(DataComponentTypes.ATTRIBUTE_MODIFIERS);
             }
         }
+    }
+
+    @Override
+    public AbstractMultiblockRecipe recipe() {
+        return new ShapelessMultiblockRecipe(this.create())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.NETHERITE_BLOCK, 2).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addStack(
+                        AbstractMultiblockRecipe.IngredientProvider.enchantedBook(Enchantments.PROTECTION, 4), 2).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.RIB_ARMOR_TRIM_SMITHING_TEMPLATE, 16).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.TURTLE_SCUTE, 64).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.ARMADILLO_SCUTE, 128).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.SHULKER_SHELL, 16).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.IRON_BLOCK, 256).build())
+                .addIngredient(AbstractMultiblockRecipe.MultiblockEntryIngredient.builder().addItem(Items.OBSIDIAN, 256).build());
     }
 }

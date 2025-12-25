@@ -9,5 +9,7 @@ public interface BankAccount extends Component {
 
     void addBalance(int coins);
 
+    void setBalance(int coins);
+
     ItemStack withdraw(int quantity, CoinItem.CoinType type);
 }

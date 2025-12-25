@@ -18,7 +18,7 @@ import java.util.*;
 
 public class PlayerOrnamentAbilities implements OrnamentAbilities{
 
-    public static final int COOLDOWN = Incantatium.DEV_MODE ? 20 : 2400; //2400 (2 min) normally
+    public static final int COOLDOWN = Incantatium.DEV_MODE ? 20 : 600; //600 (30 sec) normally
 
     //if in offhand, cooldown ticks up until it reaches 2400; @ 2400 the ability activates; when not in offhand, cooldown ticks down until 0; @ 0 it removes it from hashmap
 
@@ -49,7 +49,7 @@ public class PlayerOrnamentAbilities implements OrnamentAbilities{
     public void serverTick() {
         ItemStack stack;
         Identifier id;
-        if(!(stack = player.getOffHandStack()).isEmpty()){
+        if(!(stack = player.getOffHandStack()).isEmpty() && stack.getDamage() < stack.getMaxDamage()){
             Optional<AbstractCustomItem> opt = CustomItemHelper.getCustomItem(stack);
             if(opt.isPresent()) {
                 AbstractCustomItem custom = opt.get();

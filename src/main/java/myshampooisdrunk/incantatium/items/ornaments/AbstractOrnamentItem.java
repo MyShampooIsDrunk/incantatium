@@ -3,6 +3,7 @@ package myshampooisdrunk.incantatium.items.ornaments;
 import myshampooisdrunk.drunk_server_toolkit.item.AbstractCustomItem;
 import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.component.OrnamentAbilities;
+import myshampooisdrunk.incantatium.multiblock.recipe.AbstractMultiblockRecipe;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.UseCooldownComponent;
@@ -13,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
@@ -38,6 +40,9 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
         super(Items.FERMENTED_SPIDER_EYE, identifier, itemName, Incantatium.getModel(identifier));//Incantatium.getModel(identifier)
         this.cooldown = Math.min(Incantatium.DEV_MODE ? 600 : cooldown, cooldown);
         if(useCooldown) addComponent(DataComponentTypes.USE_COOLDOWN, new UseCooldownComponent(this.cooldown / 20f, Optional.of(Incantatium.id("ornament_cooldown"))));
+        addComponent(DataComponentTypes.MAX_STACK_SIZE, 1);
+        addComponent(DataComponentTypes.MAX_DAMAGE, 3);
+        addComponent(DataComponentTypes.DAMAGE, 0);
     }
 
     public void cooldownItems(PlayerEntity p){
@@ -48,8 +53,9 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
         return cooldown;
     }
 
-    public boolean canUse(PlayerEntity p, Hand hand){
-        if(hand == Hand.OFF_HAND) {
+    public boolean canUse(PlayerEntity p, Hand hand) {
+        ItemStack stack;
+        if(hand == Hand.OFF_HAND && (stack = p.getOffHandStack()) != null && stack.getDamage() < stack.getMaxDamage()) {
             OrnamentAbilities abilities = p.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY);
             return abilities.isActive(identifier);
         }
@@ -63,13 +69,13 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
         if(entity instanceof ServerPlayerEntity p && !world.isClient()){
             AttributeModifiersComponent attrMods = AttributeModifiersComponent.DEFAULT;
             OrnamentAbilities abilities = p.getComponent(Incantatium.ORNAMENT_ABILITIES_COMPONENT_KEY);
-            if(abilities.isActive(identifier)) {
+            if(abilities.isActive(identifier) && slot == EquipmentSlot.OFFHAND && stack.getDamage() < stack.getMaxDamage()) {
                 if(!Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
                     stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
                     p.currentScreenHandler.sendContentUpdates();
                 }
                 attrMods = getAttributeModifiers();
-                if(stack == p.getOffHandStack()) getActiveEffects(stack, world, p);
+                getActiveEffects(stack, world, p);
             }
             else if(!abilities.isActive(identifier) && Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE))) {
                 stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, false);
@@ -91,4 +97,6 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
     public AttributeModifiersComponent getAttributeModifiers(){ // should only be active in offhand slot fyi
         return AttributeModifiersComponent.DEFAULT;
     }
+
+    public abstract AbstractMultiblockRecipe recipe();
 }

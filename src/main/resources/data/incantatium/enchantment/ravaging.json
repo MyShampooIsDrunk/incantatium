@@ -31,7 +31,7 @@
     "base": 75,
     "per_level_above_first": 25
   },
-  "max_level": 3,
+  "max_level": 1,
   "min_cost": {
     "base": 25,
     "per_level_above_first": 25
@@ -40,6 +40,6 @@
     "body"
   ],
   "supported_items": "#incantatium:enchantable/horse_armor",
-  "weight": 2,
+  "weight": 1,
   "exclusive_set": "#incantatium:exclusive_set/horse_armor_ability"
 }

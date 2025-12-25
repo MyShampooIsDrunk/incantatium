@@ -37,18 +37,19 @@ public class IncantatiumRegistry {
 
     public static final AbstractCustomItem SHRINE_DISPLAY_ITEM = CustomItemRegistry.registerItem(new ShrineDisplayItem());
 
-    public static final AbstractCustomItem REVELATION_ORNAMENT = CustomItemRegistry.registerItem(new RevelationOrnamentItem());
-    public static final AbstractCustomItem ENDURANCE_ORNAMENT = CustomItemRegistry.registerItem(new EnduranceOrnamentItem());
-    public static final AbstractCustomItem SALVATION_ORNAMENT = CustomItemRegistry.registerItem(new SalvationOrnamentItem());
-    public static final AbstractCustomItem CONSTITUTION_ORNAMENT = CustomItemRegistry.registerItem(new ConstitutionOrnamentItem());
-    public static final AbstractCustomItem GALE_ORNAMENT = CustomItemRegistry.registerItem(new GaleOrnamentItem());
-    public static final AbstractCustomItem CYCLONE_ORNAMENT = CustomItemRegistry.registerItem(new CycloneOrnamentItem());
-    public static final AbstractCustomItem HYDROUS_ORNAMENT = CustomItemRegistry.registerItem(new HydrousOrnamentItem());
+    public static final RevelationOrnamentItem REVELATION_ORNAMENT = CustomItemRegistry.registerItem(new RevelationOrnamentItem());
+    public static final EnduranceOrnamentItem ENDURANCE_ORNAMENT = CustomItemRegistry.registerItem(new EnduranceOrnamentItem());
+    public static final SalvationOrnamentItem SALVATION_ORNAMENT = CustomItemRegistry.registerItem(new SalvationOrnamentItem());
+    public static final ConstitutionOrnamentItem CONSTITUTION_ORNAMENT = CustomItemRegistry.registerItem(new ConstitutionOrnamentItem());
+    public static final GaleOrnamentItem GALE_ORNAMENT = CustomItemRegistry.registerItem(new GaleOrnamentItem());
+    public static final CycloneOrnamentItem CYCLONE_ORNAMENT = CustomItemRegistry.registerItem(new CycloneOrnamentItem());
+    public static final HydrousOrnamentItem HYDROUS_ORNAMENT = CustomItemRegistry.registerItem(new HydrousOrnamentItem());
 
     public static final RegistryKey<Enchantment> RAVAGING = enchantment("ravaging");
     public static final RegistryKey<Enchantment> SOUL_LINKED = enchantment("soul_linked");
 
     public static final TagKey<Item> HORSE_ARMOR = itemTag("enchantable/horse_armor");
+    public static final TagKey<Item> FROGLIGHTS = itemTag("froglights");
 
     public static final CustomPotion BROKEN_ARMOR = CustomPotion.builder()
             .addEffect(
@@ -86,7 +87,7 @@ public class IncantatiumRegistry {
     }
 
     public static ComponentMap getCustomData(AbstractCustomItem item) {
-        return ComponentMap.builder().add(DataComponentTypes.CUSTOM_DATA,item.create().get(DataComponentTypes.CUSTOM_DATA)).build();
+        return ComponentMap.builder().add(DataComponentTypes.CUSTOM_DATA, item.create().get(DataComponentTypes.CUSTOM_DATA)).build();
     }
 
     @SuppressWarnings("unchecked")

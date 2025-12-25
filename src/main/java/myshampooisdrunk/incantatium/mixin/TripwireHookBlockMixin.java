@@ -1,0 +1,99 @@
+package myshampooisdrunk.incantatium.mixin;
+
+import net.minecraft.block.BlockState;
+import net.minecraft.block.TripwireHookBlock;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import com.google.common.base.MoreObjects;
+import net.minecraft.block.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Mixin;
+
+import static net.minecraft.block.TripwireHookBlock.*;
+
+@Mixin(TripwireHookBlock.class)
+public class TripwireHookBlockMixin {
+
+    @Shadow
+    private static void playSound(World w, BlockPos pos, boolean a, boolean on, boolean detached, boolean off) { }
+
+    @Shadow
+    private static void updateNeighborsOnAxis(Block block, World world, BlockPos pos, Direction direction) { }
+
+    @Shadow @Final public static BooleanProperty POWERED;
+
+    @Inject(method = "update", at = @At("HEAD"), cancellable = true)
+    private static void overwriteUpdate(World world, BlockPos pos, BlockState state, boolean beingRemoved, boolean bl, int i, BlockState blockState, CallbackInfo ci) {
+        ci.cancel();
+        Direction direction = state.get(FACING);
+        boolean attached = state.getOrEmpty(ATTACHED).orElse(false);
+        boolean powered = state.getOrEmpty(POWERED).orElse(false);
+        Block block = state.getBlock();
+        boolean notRemoving = !beingRemoved;
+        boolean on = false;
+        int index = 0;
+        BlockState[] blockStates = new BlockState[42];
+        BlockPos blockPos;
+        for(int k = 1; k < 42; ++k) {
+            blockPos = pos.offset(direction, k);
+            BlockState blockState2 = world.getBlockState(blockPos);
+            if (blockState2.isOf(Blocks.TRIPWIRE_HOOK)) {
+                if (blockState2.get(FACING) == direction.getOpposite()) {
+                    index = k;
+                }
+                break;
+            }
+            if (!blockState2.isOf(Blocks.TRIPWIRE) && k != i) {
+                blockStates[k] = null;
+                notRemoving = false;
+            } else {
+                if (k == i) {
+                    blockState2 = MoreObjects.firstNonNull(blockState, blockState2);
+                }
+                boolean armed = !(Boolean)blockState2.get(TripwireBlock.DISARMED);
+                on |= armed && blockState2.get(TripwireBlock.POWERED);
+                blockStates[k] = blockState2;
+                if (k == i) {
+                    world.scheduleBlockTick(pos, block, 10);
+                    notRemoving &= armed;
+                }
+            }
+        }
+        notRemoving &= index > 1;
+        on &= notRemoving;
+        BlockState newState = block.getDefaultState().with(ATTACHED, notRemoving).with(POWERED, on);
+        if (index > 0) {
+            blockPos = pos.offset(direction, index);
+            Direction blockState2 = direction.getOpposite();
+            world.setBlockState(blockPos, newState.with(FACING, blockState2), Block.NOTIFY_ALL);
+            updateNeighborsOnAxis(block, world, blockPos, blockState2);
+            playSound(world, blockPos, notRemoving, on, attached, powered);
+        }
+        playSound(world, pos, notRemoving, on, attached, powered);
+        if (!beingRemoved && world.getBlockState(pos).isOf(Blocks.TRIPWIRE_HOOK)) {
+            world.setBlockState(pos, newState.with(FACING, direction), Block.NOTIFY_ALL);
+            if (bl) {
+                updateNeighborsOnAxis(block, world, pos, direction);
+            }
+        }
+        if (attached != notRemoving) {
+            for(int x = 1; x < index; ++x) {
+                BlockPos pos2 = pos.offset(direction, x);
+                BlockState state2 = blockStates[x];
+                if (state2 != null) {
+                    if (world.getBlockState(pos2).isOf(Blocks.TRIPWIRE_HOOK)) {
+                        world.setBlockState(pos2, state2.with(ATTACHED, notRemoving), Block.NOTIFY_ALL);
+                    }
+                }
+            }
+        }
+    }
+}

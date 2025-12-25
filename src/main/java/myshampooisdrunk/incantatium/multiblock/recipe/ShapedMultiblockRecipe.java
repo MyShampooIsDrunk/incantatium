@@ -23,7 +23,7 @@ public class ShapedMultiblockRecipe extends AbstractMultiblockRecipe {
         for (int j = 0; j < size; j++) {//makes it not reliant on specific directions lol
             boolean matches = true;
             for (Integer i : pattern.keySet()) {
-                if(!pattern.get((i + j + size) % size).test(input.getEntryInSlot(i))) {
+                if(!pattern.get((i + j + size) % size).test(input.getEntryInSlot(i), world.getRegistryManager())) {
                     matches = false;
                     break;
                 }
