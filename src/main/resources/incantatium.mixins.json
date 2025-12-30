@@ -11,7 +11,9 @@
     "HappyGhastEntityMixin",
     "InteractionEntityMixin",
     "Item$SettingsMixin",
+    "ItemCooldownManagerMixin",
     "ItemsMixin",
+    "ItemMixin",
     "LivingEntityMixin",
     "MaceItemMixin",
     "PlayerInventoryMixin",
@@ -20,7 +22,8 @@
     "ServerPlayerInteractionManagerMixin",
     "StatusEffectsMixin",
     "TridentItemMixin",
-    "TripwireHookBlockMixin"
+    "TripwireHookBlockMixin",
+    "UseCooldownComponentMixin"
   ],
   "injectors": {
     "defaultRequire": 1

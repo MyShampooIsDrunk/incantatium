@@ -1,18 +1,19 @@
 package myshampooisdrunk.incantatium.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import myshampooisdrunk.drunk_server_toolkit.item.CustomItemHelper;
-import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.items.ornaments.SalvationOrnamentItem;
 import myshampooisdrunk.incantatium.registry.IncantatiumRegistry;
-import net.minecraft.block.Block;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.SideShapeType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DeathProtectionComponent;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -22,6 +23,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.MaceItem;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryKeys;
@@ -30,10 +32,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.Properties;
+import net.minecraft.stat.Stats;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import org.spongepowered.asm.mixin.Mixin;
@@ -71,6 +74,10 @@ public abstract class LivingEntityMixin extends Entity {
     @Shadow public abstract double getAttributeValue(RegistryEntry<EntityAttribute> attribute);
 
     @Shadow public abstract @Nullable ItemStack getBlockingItem();
+
+    @Shadow public abstract ItemStack getStackInHand(Hand hand);
+
+    @Shadow public abstract void setHealth(float health);
 
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
@@ -177,24 +184,59 @@ public abstract class LivingEntityMixin extends Entity {
         return original;
     }
 
-    @Inject(method="tryUseDeathProtector", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;copy()Lnet/minecraft/item/ItemStack;"), cancellable = true)
-    public void cancelReviveIfOnCooldown(DamageSource source, CallbackInfoReturnable<Boolean> cir, @Local ItemStack stack, @Local DeathProtectionComponent component){
-        if(dis instanceof ServerPlayerEntity p){
-            if(p.getItemCooldownManager().isCoolingDown(stack)) cir.setReturnValue(false);
+    //TODO!!!
+//    @Inject(method="tryUseDeathProtector", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;copy()Lnet/minecraft/item/ItemStack;"), cancellable = true)
+//    public void cancelReviveIfOnCooldown(DamageSource source, CallbackInfoReturnable<Boolean> cir, @Local ItemStack stack, @Local DeathProtectionComponent component){
+//        if(dis instanceof ServerPlayerEntity p){
+//            if(p.getItemCooldownManager().isCoolingDown(stack)) cir.setReturnValue(false);
+//        }
+//    }
+
+    @Inject(method = "tryUseDeathProtector", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;copy()Lnet/minecraft/item/ItemStack;"), cancellable = true)
+    public void injectSalvationOrnament(DamageSource source, CallbackInfoReturnable<Boolean> cir, @Local Hand hand, @Local ItemStack stack) {
+        if(hand == Hand.OFF_HAND && stack != null && dis instanceof ServerPlayerEntity p) {
+            CustomItemHelper.getCustomItem(stack).ifPresent(custom -> {
+                if(custom instanceof SalvationOrnamentItem o) {
+                    boolean bl = true;
+                    NbtComponent nbt;
+                    if((nbt = stack.get(DataComponentTypes.CUSTOM_DATA)) != null) {
+                        NbtCompound comp = nbt.copyNbt();
+                        int charges = comp.getInt("charges").orElse(-1);
+                        if(charges > 0 && charges <= 2) {
+                            bl = false;
+                            comp.putInt("charges", charges - 1);
+                            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(comp));
+                        }
+                    }
+
+                    if(bl && p.getItemCooldownManager().getCooldownProgress(stack, 0.0F) == 0.0F) {
+                        o.cooldownItems(p);
+                        bl = false;
+                    }
+
+                    if(!bl && dis instanceof ServerPlayerEntity player)
+                        cir.setReturnValue(incantatium$useDeathProtector(stack, player));
+                }
+            });
         }
     }
 
-    @Redirect(method = "tryUseDeathProtector",at= @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;decrement(I)V"))
-    public void useSalvationOrnament(ItemStack instance, int amount){
-        AtomicBoolean bl = new AtomicBoolean(true);
-        CustomItemHelper.getCustomItem(instance).ifPresent(custom -> {
-            if(custom instanceof SalvationOrnamentItem o && dis instanceof ServerPlayerEntity p) {
-                o.cooldownItems(p);
-                bl.set(false);
-            }
-        });
-        if(bl.get()) instance.decrement(amount);
+    @Unique
+    private boolean incantatium$useDeathProtector(ItemStack itemStack, ServerPlayerEntity player) {
+        DeathProtectionComponent deathProtectionComponent = itemStack.get(DataComponentTypes.DEATH_PROTECTION);
+        if(deathProtectionComponent == null) return false;
+        player.incrementStat(Stats.USED.getOrCreateStat(itemStack.getItem()));
+        Criteria.USED_TOTEM.trigger(player, itemStack);
+        this.emitGameEvent(GameEvent.ITEM_INTERACT_FINISH);
+        this.setHealth(1.0F);
+        deathProtectionComponent.applyDeathEffects(itemStack, player);
+        this.getEntityWorld().sendEntityStatus(this, EntityStatuses.USE_TOTEM_OF_UNDYING);
+        return true;
     }
+
+//    @WrapOperation(method = "tryUseDeathProtector", at= @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;decrement(I)V"))
+//    public void useSalvationOrnament(ItemStack stack, int amount, Operation<Void> original){
+//    }
 
     @Inject(method = "takeShieldHit", at = @At("HEAD"))
     public void injectDisableMace(ServerWorld world, LivingEntity attacker, CallbackInfo ci) {

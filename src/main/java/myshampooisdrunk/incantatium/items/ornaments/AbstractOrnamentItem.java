@@ -38,7 +38,7 @@ public abstract class AbstractOrnamentItem extends AbstractCustomItem {
 
     public AbstractOrnamentItem(Identifier identifier, String itemName, int cooldown, boolean useCooldown) {
         super(Items.FERMENTED_SPIDER_EYE, identifier, itemName, Incantatium.getModel(identifier));//Incantatium.getModel(identifier)
-        this.cooldown = Math.min(Incantatium.DEV_MODE ? 600 : cooldown, cooldown);
+        this.cooldown = Incantatium.DEV_MODE ? Math.min(600, cooldown) : cooldown;
         if(useCooldown) addComponent(DataComponentTypes.USE_COOLDOWN, new UseCooldownComponent(this.cooldown / 20f, Optional.of(Incantatium.id("ornament_cooldown"))));
         addComponent(DataComponentTypes.MAX_STACK_SIZE, 1);
         addComponent(DataComponentTypes.MAX_DAMAGE, 3);

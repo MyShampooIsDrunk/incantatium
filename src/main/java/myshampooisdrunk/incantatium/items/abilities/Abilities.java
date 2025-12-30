@@ -24,27 +24,29 @@ public class Abilities {
             int charges = player.getComponent(Incantatium.RIPTIDE_COOLDOWN_COMPONENT_KEY).get();
             StringBuilder txt = new StringBuilder();
             for (int i = 0; i < 3; i++) {
-                if(i <= charges) {
+                if(i < charges) {
                     txt.append('\uEa01');
                 } else txt.append('\uEa02');
-                txt.append(' ');
+                if(i < 2) txt.append(" | ");
             }
             return Text.literal(txt.toString());
         }),
         SALVATION(player -> {
             Optional<AbstractCustomItem> item;
             ItemStack stack;
-            NbtComponent nbt;
-            if((item = CustomItemHelper.getCustomItem(stack = player.getOffHandStack())).isPresent() && item.get() instanceof SalvationOrnamentItem
-                && stack.contains(DataComponentTypes.CUSTOM_DATA) && (nbt = stack.get(DataComponentTypes.CUSTOM_DATA)) != null) {
-                int charges = nbt.copyNbt().getInt("charges").orElse(-1);
-                if(charges > 0) {
+            if((item = CustomItemHelper.getCustomItem(stack = player.getOffHandStack())).isPresent() && item.get() instanceof SalvationOrnamentItem) {
+                int charges = SalvationOrnamentItem.getCharges(player, stack);
+                if(charges >= 0) {
                     StringBuilder txt = new StringBuilder();
-                    for (int i = 0; i < 3; i++) {
-                        if(i <= charges) {
-                            txt.append('\uEa11');
-                        } else txt.append('\uEa12');
-                        txt.append(' ');
+                    if(charges/10 == 1)
+                        txt.append("\uEa11 | ");
+                    else
+                        txt.append("\uEa12 | ");
+
+                    switch ((charges % 10) % 3) {
+                        case 0 -> txt.append("\uEa12 | \uEa12");
+                        case 1 -> txt.append("\uEa11 | \uEa12");
+                        case 2 -> txt.append("\uEa11 | \uEa11");
                     }
                     return Text.literal(txt.toString());
                 }

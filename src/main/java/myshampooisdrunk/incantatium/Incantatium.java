@@ -35,7 +35,7 @@ import java.util.List;
 
 public class Incantatium implements ModInitializer {
 
-	public static final boolean DEV_MODE = false;
+	public static final boolean DEV_MODE = Boolean.parseBoolean(System.getenv("DEV_MODE"));
 
     public static final Logger LOGGER = LoggerFactory.getLogger("incantatium");
 
@@ -74,6 +74,7 @@ public class Incantatium implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		if(DEV_MODE) LOGGER.info("NOTE: DEV MODE IS ON");
 		ServerPlayerEvents.COPY_FROM.register(PostDeathHelper::copyBankAccount);
 		ServerPlayerEvents.COPY_FROM.register(PostDeathHelper::copySoulBoundItems);
 		ServerPlayerEvents.AFTER_RESPAWN.register(PostDeathHelper::damageOrnament);

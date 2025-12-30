@@ -62,17 +62,26 @@ public class PlayerRiptideCooldown implements RiptideCooldown{
             lastUse = 0;
             if(charges < MAX_CHARGES){//should always be true but just in case
                 charges++;
+                StringBuilder txt = new StringBuilder();
+                for (int i = 0; i < 3; i++) {
+                    if(i < charges) {
+                        txt.append('\uEa01');
+                    } else txt.append('\uEa02');
+                    if(i < 2) txt.append(" | ");
+                }
                 player.sendMessage(
                         Text.literal("RIPTIDE RECHARGED | ")
-                                .append(Text.literal(charges + " / " + MAX_CHARGES).setStyle(
+                                .append(Text.literal(txt.toString()).setStyle(
                                         Style.EMPTY.withBold(true).withColor(switch(charges){
                                             case 0 -> Colors.RED;
                                             case 1 -> Colors.LIGHT_RED;
                                             case 2 -> Colors.YELLOW;
                                             default -> Colors.GREEN;
                                         })
-                                )).append(Text.literal(" REMAINING")), true
+                                )), true
                 );
+            } else if(charges > MAX_CHARGES) {
+                charges = MAX_CHARGES;
             }
         }
     }

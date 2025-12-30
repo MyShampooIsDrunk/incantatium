@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class EnduranceOrnamentItem extends AbstractOrnamentItem{
-    private static final float SHIELD_COOLDOWN_MULTIPLITER = 3F;
+    private static final float SHIELD_COOLDOWN_MULTIPLITER = 2F;
 
     public EnduranceOrnamentItem() {
         super(Incantatium.id("endurance_ornament"), "Endurance", (int) (SHIELD_COOLDOWN_MULTIPLITER * 100), false);
