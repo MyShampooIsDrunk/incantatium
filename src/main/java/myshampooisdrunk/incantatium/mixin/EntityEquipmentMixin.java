@@ -1,9 +1,5 @@
 package myshampooisdrunk.incantatium.mixin;
 
-import myshampooisdrunk.drunk_server_toolkit.item.AbstractCustomItem;
-import myshampooisdrunk.drunk_server_toolkit.item.CustomItemHelper;
-import myshampooisdrunk.incantatium.items.ornaments.AbstractOrnamentItem;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.EntityEquipment;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -11,7 +7,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-import java.util.Optional;
 import java.util.function.BiFunction;
 
 import static myshampooisdrunk.incantatium.util.PostDeathHelper.isSoulbound;

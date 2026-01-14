@@ -1,10 +1,10 @@
 package myshampooisdrunk.incantatium.loot.function;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import myshampooisdrunk.incantatium.registry.IncantatiumRegistry;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.BundleContentsComponent;
 import net.minecraft.item.Item;
@@ -41,16 +41,7 @@ public class SetBundleContentsLootFunction extends ConditionalLootFunction {
 
     @Override
     public LootFunctionType<SetBundleContentsLootFunction> getType() {
-        return ActuallyChallengingRaids.SET_BUNDLE_CONTENTS;
-    }
-
-    @Override
-    public Set<LootContextParameter<?>> getRequiredParameters() {
-        return this.itemCounts
-                .values()
-                .stream()
-                .flatMap(numberProvider -> numberProvider.getRequiredParameters().stream())
-                .collect(ImmutableSet.toImmutableSet());
+        return IncantatiumRegistry.SET_BUNDLE_CONTENTS;
     }
 
     @Override

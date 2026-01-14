@@ -5,7 +5,6 @@ import myshampooisdrunk.drunk_server_toolkit.item.CustomItemHelper;
 import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.component.OrnamentAbilities;
 import myshampooisdrunk.incantatium.items.ornaments.AbstractOrnamentItem;
-import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -13,8 +12,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.GameRules;
 
 import java.util.Optional;
-
-import static net.minecraft.entity.player.PlayerInventory.EQUIPMENT_SLOTS;
 
 public class PostDeathHelper {
     public static void copySoulBoundItems(ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer, boolean alive) {

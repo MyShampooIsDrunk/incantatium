@@ -15,9 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public class HydrousOrnamentItem extends AbstractOrnamentItem{
@@ -37,13 +35,13 @@ public class HydrousOrnamentItem extends AbstractOrnamentItem{
     @Override
     public void use(World world, LivingEntity l, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         super.use(world, l, hand, cir);
-        if(l instanceof PlayerEntity user && canUse(user, hand)) user.addStatusEffect(new StatusEffectInstance(StatusEffects.CONDUIT_POWER, 400, 2));
+        if(l instanceof PlayerEntity user && canUse(user, hand)) user.addStatusEffect(new StatusEffectInstance(StatusEffects.CONDUIT_POWER, 600, 2));
     }
 
     @Override
     public AttributeModifiersComponent getAttributeModifiers() {
         return AttributeModifiersComponent.builder().add(EntityAttributes.WATER_MOVEMENT_EFFICIENCY,
-                new EntityAttributeModifier(this.identifier, 0.1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE),
+                new EntityAttributeModifier(this.identifier, 0.2, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE),
                 AttributeModifierSlot.OFFHAND).build();
     }
 

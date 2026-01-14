@@ -1,7 +1,5 @@
 package myshampooisdrunk.incantatium.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -12,6 +10,7 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SideShapeType;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.BlocksAttacksComponent;
 import net.minecraft.component.type.DeathProtectionComponent;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.*;
@@ -47,8 +46,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static net.minecraft.entity.effect.StatusEffects.*;
 
@@ -63,8 +60,6 @@ public abstract class LivingEntityMixin extends Entity {
     private static final List<RegistryEntry<StatusEffect>> negative = List.of(BLINDNESS, WEAKNESS, HUNGER,
             POISON, WITHER, GLOWING, LEVITATION, UNLUCK, DARKNESS, WIND_CHARGED, WEAVING, OOZING, INFESTED, SLOWNESS, NAUSEA, MINING_FATIGUE);
 
-    @Shadow public abstract void jump();
-
     @Shadow public abstract ItemStack getEquippedStack(EquipmentSlot slot);
 
     @Shadow public abstract boolean hasStackEquipped(EquipmentSlot slot);
@@ -75,20 +70,11 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Shadow public abstract @Nullable ItemStack getBlockingItem();
 
-    @Shadow public abstract ItemStack getStackInHand(Hand hand);
-
     @Shadow public abstract void setHealth(float health);
 
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
     }
-
-//    @Inject(method="getPreferredEquipmentSlot",at=@At("HEAD"), cancellable = true)
-//    public void addPreferredEquipmentSlotCustomArmorItem(ItemStack stack, CallbackInfoReturnable<EquipmentSlot> cir){
-//        CustomItemHelper.getCustomItem(stack).ifPresent(custom -> {
-//            if(custom instanceof AbstractCustomArmorItem i) cir.setReturnValue(i.getSlotType());
-//        });
-//    }
 
     private final LivingEntity dis = (LivingEntity) (Object) this;
 
@@ -184,16 +170,10 @@ public abstract class LivingEntityMixin extends Entity {
         return original;
     }
 
-    //TODO!!!
-//    @Inject(method="tryUseDeathProtector", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;copy()Lnet/minecraft/item/ItemStack;"), cancellable = true)
-//    public void cancelReviveIfOnCooldown(DamageSource source, CallbackInfoReturnable<Boolean> cir, @Local ItemStack stack, @Local DeathProtectionComponent component){
-//        if(dis instanceof ServerPlayerEntity p){
-//            if(p.getItemCooldownManager().isCoolingDown(stack)) cir.setReturnValue(false);
-//        }
-//    }
-
     @Inject(method = "tryUseDeathProtector", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;copy()Lnet/minecraft/item/ItemStack;"), cancellable = true)
     public void injectSalvationOrnament(DamageSource source, CallbackInfoReturnable<Boolean> cir, @Local Hand hand, @Local ItemStack stack) {
+        if(incantatium$testSaddleForDeathProtector()) cir.setReturnValue(true);
+
         if(hand == Hand.OFF_HAND && stack != null && dis instanceof ServerPlayerEntity p) {
             CustomItemHelper.getCustomItem(stack).ifPresent(custom -> {
                 if(custom instanceof SalvationOrnamentItem o) {
@@ -238,12 +218,40 @@ public abstract class LivingEntityMixin extends Entity {
 //    public void useSalvationOrnament(ItemStack stack, int amount, Operation<Void> original){
 //    }
 
+    private boolean incantatium$testSaddleForDeathProtector() {
+        if(!this.hasStackEquipped(EquipmentSlot.SADDLE)) return false;
+        ItemStack itemStack = this.getEquippedStack(EquipmentSlot.SADDLE);
+        DeathProtectionComponent deathProtectionComponent = null;
+
+        deathProtectionComponent = itemStack.get(DataComponentTypes.DEATH_PROTECTION);
+        if (deathProtectionComponent == null)
+            return false;
+        else itemStack.decrement(1);
+
+
+        if (dis instanceof ServerPlayerEntity serverPlayerEntity) {
+            serverPlayerEntity.incrementStat(Stats.USED.getOrCreateStat(itemStack.getItem()));
+            Criteria.USED_TOTEM.trigger(serverPlayerEntity, itemStack);
+            this.emitGameEvent(GameEvent.ITEM_INTERACT_FINISH);
+        }
+
+        this.setHealth(1.0F);
+        deathProtectionComponent.applyDeathEffects(itemStack, dis);
+        this.getEntityWorld().sendEntityStatus(this, EntityStatuses.USE_TOTEM_OF_UNDYING);
+
+        return true;
+    }
+
     @Inject(method = "takeShieldHit", at = @At("HEAD"))
     public void injectDisableMace(ServerWorld world, LivingEntity attacker, CallbackInfo ci) {
         if(attacker.getWeaponStack().isOf(Items.MACE) && attacker instanceof PlayerEntity p && MaceItem.shouldDealAdditionalDamage(p)) {
             p.getItemCooldownManager().set(p.getWeaponStack(), 300);
             world.playSound(null, attacker.getX(), attacker.getY(), attacker.getZ(), SoundEvents.BLOCK_NOTE_BLOCK_BELL, SoundCategory.PLAYERS, 1.5f ,0.5f);
-            Objects.requireNonNull(Objects.requireNonNull(this.getBlockingItem()).get(DataComponentTypes.BLOCKS_ATTACKS)).applyShieldCooldown(world, dis, 7.5f, this.getBlockingItem());
+            ItemStack blockingItem = this.getBlockingItem();
+            BlocksAttacksComponent c;
+            if(blockingItem != null && (c = blockingItem.get(DataComponentTypes.BLOCKS_ATTACKS)) != null) {
+                c.applyShieldCooldown(world, dis, 7.5f, blockingItem);
+            }
         }
     }
 

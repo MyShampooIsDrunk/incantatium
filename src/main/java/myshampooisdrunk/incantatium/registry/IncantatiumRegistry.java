@@ -77,7 +77,9 @@ public class IncantatiumRegistry {
     // ladders, all vines, cobwebs, dripleaf, flowers, chorus, coral, sniffer eggs, turtle eggs, sponges, slime, honey,
     // pumpkins, melons, sculk, froglights, sea lanterns, kelp blocks, sea pickles, lily pads, crops, saplings, moss, snow,
     // ice, tnt, all storage blocks (I don't want people to lose their items)
-    public static final TagKey<Block> TO_AIR = TagKey.of(RegistryKeys.BLOCK,  Incantatium.id( "to_air"));
+    public static final TagKey<Block> TO_AIR = TagKey.of(RegistryKeys.BLOCK, Incantatium.id( "to_air"));
+
+    public static final TagKey<Block> INDESTRUCTIBLE = TagKey.of(RegistryKeys.BLOCK, Incantatium.id( "indestructible"));
 
     public static final TagKey<Block> TO_GRAVEL = TagKey.of(RegistryKeys.BLOCK,  Incantatium.id( "to_gravel"));
 

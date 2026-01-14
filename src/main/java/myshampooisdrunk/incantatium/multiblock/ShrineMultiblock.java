@@ -8,15 +8,12 @@ import myshampooisdrunk.drunk_server_toolkit.multiblock.structure.MultiblockStru
 import myshampooisdrunk.drunk_server_toolkit.util.BlockUtil;
 import myshampooisdrunk.drunk_server_toolkit.world.MultiblockCacheI;
 import myshampooisdrunk.incantatium.Incantatium;
-import myshampooisdrunk.incantatium.component.InventoryStorage;
 import myshampooisdrunk.incantatium.multiblock.entity.PedestalEntity;
 import myshampooisdrunk.incantatium.registry.IncantatiumRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 

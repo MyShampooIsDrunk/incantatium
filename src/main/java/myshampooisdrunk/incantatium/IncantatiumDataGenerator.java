@@ -40,7 +40,9 @@ public class IncantatiumDataGenerator implements DataGeneratorEntrypoint {
 		FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 		IncantatiumRegistry.init();
 		pack.addProvider(CustomRecipeProvider::new);
-//		pack.addProvider(CustomEnchantmentProvider::new);
+		pack.addProvider(EntityTagGen::new);
+		pack.addProvider(BlockTagGen::new);
+		pack.addProvider(RaidRewardLootTable::new);
 	}
 
 	private static class EntityTagGen extends FabricTagProvider.EntityTypeTagProvider {
@@ -180,7 +182,7 @@ public class IncantatiumDataGenerator implements DataGeneratorEntrypoint {
 
 			valueLookupBuilder(AS_BRICKS).add(Blocks.BRICKS, Blocks.BRICK_STAIRS,Blocks.BRICK_SLAB);// -> terracotta
 
-			valueLookupBuilder(AS_PURPUR).add(Blocks.PURPUR_BLOCK,Blocks.PURPUR_SLAB,Blocks.PURPUR_PILLAR,Blocks.PURPUR_STAIRS);// -> air
+			//valueLookupBuilder(AS_PURPUR).add(Blocks.PURPUR_BLOCK,Blocks.PURPUR_SLAB,Blocks.PURPUR_PILLAR,Blocks.PURPUR_STAIRS);// -> air
 
 			valueLookupBuilder(AS_END_STONE).add(Blocks.END_STONE,Blocks.END_STONE_BRICK_SLAB,Blocks.END_STONE_BRICK_STAIRS,Blocks.END_STONE_BRICKS);// -> sandstone i think
 
@@ -199,8 +201,8 @@ public class IncantatiumDataGenerator implements DataGeneratorEntrypoint {
 			);
 
 			//Blocks.CHISELED_QUARTZ_BLOCK, Blocks.QUARTZ_BRICKS -> Quartz block -> air
-			valueLookupBuilder(AS_QUARTZ).add(Blocks.QUARTZ_BLOCK, Blocks.SMOOTH_QUARTZ, Blocks.QUARTZ_SLAB,
-					Blocks.SMOOTH_QUARTZ_SLAB, Blocks.QUARTZ_STAIRS, Blocks.SMOOTH_QUARTZ_STAIRS);
+//			valueLookupBuilder(AS_QUARTZ).add(Blocks.QUARTZ_BLOCK, Blocks.SMOOTH_QUARTZ, Blocks.QUARTZ_SLAB,
+//					Blocks.SMOOTH_QUARTZ_SLAB, Blocks.QUARTZ_STAIRS, Blocks.SMOOTH_QUARTZ_STAIRS);
 
 			valueLookupBuilder(AS_BASALT).add(Blocks.BASALT,Blocks.POLISHED_BASALT,Blocks.SMOOTH_BASALT);// -> deepslate
 
@@ -251,190 +253,196 @@ public class IncantatiumDataGenerator implements DataGeneratorEntrypoint {
 					Blocks.MUDDY_MANGROVE_ROOTS
 			);
 
-			valueLookupBuilder(AS_GLASS_PANE).add(
-					Blocks.GLASS_PANE,
-					Blocks.GRAY_STAINED_GLASS_PANE,
-					Blocks.BLACK_STAINED_GLASS_PANE,
-					Blocks.BLUE_STAINED_GLASS_PANE,
-					Blocks.CYAN_STAINED_GLASS_PANE,
-					Blocks.BROWN_STAINED_GLASS_PANE,
-					Blocks.GREEN_STAINED_GLASS_PANE,
-					Blocks.LIGHT_BLUE_STAINED_GLASS_PANE,
-					Blocks.LIGHT_GRAY_STAINED_GLASS_PANE,
-					Blocks.LIME_STAINED_GLASS_PANE,
-					Blocks.MAGENTA_STAINED_GLASS_PANE,
-					Blocks.ORANGE_STAINED_GLASS_PANE,
-					Blocks.PINK_STAINED_GLASS_PANE,
-					Blocks.YELLOW_STAINED_GLASS_PANE,
-					Blocks.WHITE_STAINED_GLASS_PANE,
-					Blocks.RED_STAINED_GLASS_PANE,
-					Blocks.PURPLE_STAINED_GLASS_PANE
-			);
-			valueLookupBuilder(AS_GLASS).add(
-					Blocks.GLASS,
-					Blocks.GRAY_STAINED_GLASS,
-					Blocks.BLACK_STAINED_GLASS,
-					Blocks.BLUE_STAINED_GLASS,
-					Blocks.CYAN_STAINED_GLASS,
-					Blocks.BROWN_STAINED_GLASS,
-					Blocks.GREEN_STAINED_GLASS,
-					Blocks.LIGHT_BLUE_STAINED_GLASS,
-					Blocks.LIGHT_GRAY_STAINED_GLASS,
-					Blocks.LIME_STAINED_GLASS,
-					Blocks.MAGENTA_STAINED_GLASS,
-					Blocks.ORANGE_STAINED_GLASS,
-					Blocks.PINK_STAINED_GLASS,
-					Blocks.YELLOW_STAINED_GLASS,
-					Blocks.WHITE_STAINED_GLASS,
-					Blocks.RED_STAINED_GLASS,
-					Blocks.PURPLE_STAINED_GLASS,
-					Blocks.TINTED_GLASS
-			);
+//			valueLookupBuilder(AS_GLASS_PANE).add(
+//					Blocks.GLASS_PANE,
+//					Blocks.GRAY_STAINED_GLASS_PANE,
+//					Blocks.BLACK_STAINED_GLASS_PANE,
+//					Blocks.BLUE_STAINED_GLASS_PANE,
+//					Blocks.CYAN_STAINED_GLASS_PANE,
+//					Blocks.BROWN_STAINED_GLASS_PANE,
+//					Blocks.GREEN_STAINED_GLASS_PANE,
+//					Blocks.LIGHT_BLUE_STAINED_GLASS_PANE,
+//					Blocks.LIGHT_GRAY_STAINED_GLASS_PANE,
+//					Blocks.LIME_STAINED_GLASS_PANE,
+//					Blocks.MAGENTA_STAINED_GLASS_PANE,
+//					Blocks.ORANGE_STAINED_GLASS_PANE,
+//					Blocks.PINK_STAINED_GLASS_PANE,
+//					Blocks.YELLOW_STAINED_GLASS_PANE,
+//					Blocks.WHITE_STAINED_GLASS_PANE,
+//					Blocks.RED_STAINED_GLASS_PANE,
+//					Blocks.PURPLE_STAINED_GLASS_PANE
+//			);
 
-			valueLookupBuilder(TO_AIR)
-					.addTag(AS_GLASS)
-					.addTag(AS_GLASS_PANE)
-					.addTag(AS_QUARTZ)
-					.addTag(AS_PURPUR)
-					.addOptionalTag(BlockTags.CHAINS)
-					.addOptionalTag(BlockTags.BEDS)
-					.addOptionalTag(BlockTags.DIRT)
-					.addOptionalTag(BlockTags.CONCRETE_POWDER)
-					.addOptionalTag(BlockTags.CANDLES)
-					.addOptionalTag(BlockTags.WOOL_CARPETS)
-					.addOptionalTag(BlockTags.WOOL)
-					.addOptionalTag(BlockTags.SHULKER_BOXES)
-					.addOptionalTag(BlockTags.LEAVES)
-					.addOptionalTag(BlockTags.CORALS)
-					.addOptionalTag(BlockTags.SAPLINGS)
-					.addOptionalTag(BlockTags.FLOWERS)
-					.addOptionalTag(BlockTags.CAVE_VINES)
-					.addOptionalTag(BlockTags.BUTTONS)
-					.addOptionalTag(BlockTags.TRAPDOORS)
-					.addOptionalTag(BlockTags.DOORS)
-					.addOptionalTag(BlockTags.PRESSURE_PLATES)
-					.addOptionalTag(BlockTags.CAULDRONS)
-					.addOptionalTag(BlockTags.FENCE_GATES)
-					.addOptionalTag(BlockTags.FENCES)
-					.addOptionalTag(BlockTags.WALLS)
-					.addOptionalTag(BlockTags.ALL_SIGNS)
-					.addOptionalTag(BlockTags.CAMPFIRES)
-					.addOptionalTag(BlockTags.CROPS)
-					.addOptionalTag(BlockTags.BANNERS)
-					.addOptionalTag(BlockTags.WART_BLOCKS)
-					.addOptionalTag(BlockTags.CANDLE_CAKES)
-					.addOptionalTag(BlockTags.PLANKS)
-					.addOptionalTag(BlockTags.WOODEN_STAIRS)
-					.addOptionalTag(BlockTags.WOODEN_SLABS)
-					.addOptionalTag(BlockTags.FLOWER_POTS)
+//			valueLookupBuilder(AS_GLASS).add(
+//					Blocks.GLASS,
+//					Blocks.GRAY_STAINED_GLASS,
+//					Blocks.BLACK_STAINED_GLASS,
+//					Blocks.BLUE_STAINED_GLASS,
+//					Blocks.CYAN_STAINED_GLASS,
+//					Blocks.BROWN_STAINED_GLASS,
+//					Blocks.GREEN_STAINED_GLASS,
+//					Blocks.LIGHT_BLUE_STAINED_GLASS,
+//					Blocks.LIGHT_GRAY_STAINED_GLASS,
+//					Blocks.LIME_STAINED_GLASS,
+//					Blocks.MAGENTA_STAINED_GLASS,
+//					Blocks.ORANGE_STAINED_GLASS,
+//					Blocks.PINK_STAINED_GLASS,
+//					Blocks.YELLOW_STAINED_GLASS,
+//					Blocks.WHITE_STAINED_GLASS,
+//					Blocks.RED_STAINED_GLASS,
+//					Blocks.PURPLE_STAINED_GLASS,
+//					Blocks.TINTED_GLASS
+//			);
 
-					.add(
-							Blocks.SHROOMLIGHT,
-							Blocks.FROSTED_ICE,
-							Blocks.ICE,
-							Blocks.CHEST,
-							Blocks.BARREL,
-							Blocks.SAND,
-							Blocks.RED_SAND,
-							Blocks.BROWN_MUSHROOM,
-							Blocks.RED_MUSHROOM,
-							Blocks.TNT,
-							Blocks.CACTUS,
-							Blocks.CLAY,
-							Blocks.PUMPKIN,
-							Blocks.CARVED_PUMPKIN,
-							Blocks.MELON,
-							Blocks.CRIMSON_FUNGUS,
-							Blocks.CRIMSON_NYLIUM,
-							Blocks.CRIMSON_ROOTS,
-							Blocks.WARPED_FUNGUS,
-							Blocks.WARPED_NYLIUM,
-							Blocks.WARPED_ROOTS,
-							Blocks.NETHERRACK,
-							Blocks.SCULK,
-							Blocks.SPONGE,
-							Blocks.WET_SPONGE,
-							Blocks.SNIFFER_EGG,
-							Blocks.TURTLE_EGG,
-							Blocks.SLIME_BLOCK,
-							Blocks.HONEY_BLOCK,
-							Blocks.HONEYCOMB_BLOCK,
-							Blocks.SEA_PICKLE,
-							Blocks.SEA_LANTERN,
-							Blocks.GLOWSTONE,
-							Blocks.OCHRE_FROGLIGHT,
-							Blocks.PEARLESCENT_FROGLIGHT,
-							Blocks.VERDANT_FROGLIGHT,
-							Blocks.TWISTING_VINES,
-							Blocks.WEEPING_VINES,
-							Blocks.TWISTING_VINES_PLANT,
-							Blocks.WEEPING_VINES_PLANT,
-							Blocks.VINE,
-							Blocks.LADDER,
-							Blocks.AMETHYST_CLUSTER,
-							Blocks.LARGE_AMETHYST_BUD,
-							Blocks.MEDIUM_AMETHYST_BUD,
-							Blocks.SMALL_AMETHYST_BUD,
-							Blocks.AMETHYST_BLOCK,
-							Blocks.BAMBOO,
-							Blocks.BAMBOO_SAPLING,
-							Blocks.IRON_BARS,
-							Blocks.COBWEB,
-							Blocks.POINTED_DRIPSTONE,
-							Blocks.BEE_NEST,
-							Blocks.BEEHIVE,
-							Blocks.SNOW,
-							Blocks.SNOW_BLOCK,
-							Blocks.POWDER_SNOW,
-							Blocks.MANGROVE_ROOTS,
-							Blocks.LILY_PAD,
-							Blocks.DRIED_KELP_BLOCK,
-							Blocks.CAKE,
-							Blocks.FURNACE,
-							Blocks.DROPPER,
-							Blocks.DISPENSER,
-							Blocks.COMPOSTER,
-							Blocks.SMOKER,
-							Blocks.BLAST_FURNACE,
-							Blocks.JUKEBOX,
-							Blocks.BREWING_STAND,
-							Blocks.DECORATED_POT,
-							Blocks.CHISELED_BOOKSHELF,
-							Blocks.BOOKSHELF,
-							Blocks.LECTERN,
-							Blocks.TRAPPED_CHEST,
-							Blocks.PISTON,
-							Blocks.PISTON_HEAD,
-							Blocks.STICKY_PISTON,
-							Blocks.INFESTED_COBBLESTONE,
-							Blocks.INFESTED_CHISELED_STONE_BRICKS,
-							Blocks.INFESTED_DEEPSLATE,
-							Blocks.INFESTED_STONE,
-							Blocks.INFESTED_CRACKED_STONE_BRICKS,
-							Blocks.INFESTED_STONE_BRICKS,
-							Blocks.INFESTED_MOSSY_STONE_BRICKS,
-							Blocks.SUSPICIOUS_GRAVEL,
-							Blocks.SUSPICIOUS_SAND,
-							Blocks.DIRT_PATH,
-							Blocks.FARMLAND,
-							Blocks.SHORT_GRASS,
-							Blocks.TALL_GRASS,
-							Blocks.SEAGRASS,
-							Blocks.TALL_SEAGRASS,
-							Blocks.KELP,
-							Blocks.SUGAR_CANE,
-							Blocks.TORCH,
-							Blocks.LOOM,
-							Blocks.STONECUTTER,
-							Blocks.CARTOGRAPHY_TABLE,
-							Blocks.SMITHING_TABLE,
-							Blocks.GRINDSTONE,
-							Blocks.FLETCHING_TABLE,
-							Blocks.CAULDRON,
-							Blocks.BREWING_STAND,
-							Blocks.HOPPER,
-							Blocks.LIGHTNING_ROD
-					);
+//			valueLookupBuilder(TO_AIR)
+//					.addTag(AS_GLASS)
+//					.addTag(AS_GLASS_PANE)
+//					.addTag(AS_QUARTZ)
+//					.addTag(AS_PURPUR)
+//					.addOptionalTag(BlockTags.CHAINS)
+//					.addOptionalTag(BlockTags.BEDS)
+//					.addOptionalTag(BlockTags.DIRT)
+//					.addOptionalTag(BlockTags.CONCRETE_POWDER)
+//					.addOptionalTag(BlockTags.CANDLES)
+//					.addOptionalTag(BlockTags.WOOL_CARPETS)
+//					.addOptionalTag(BlockTags.WOOL)
+//					.addOptionalTag(BlockTags.SHULKER_BOXES)
+//					.addOptionalTag(BlockTags.LEAVES)
+//					.addOptionalTag(BlockTags.CORALS)
+//					.addOptionalTag(BlockTags.SAPLINGS)
+//					.addOptionalTag(BlockTags.FLOWERS)
+//					.addOptionalTag(BlockTags.CAVE_VINES)
+//					.addOptionalTag(BlockTags.BUTTONS)
+//					.addOptionalTag(BlockTags.TRAPDOORS)
+//					.addOptionalTag(BlockTags.DOORS)
+//					.addOptionalTag(BlockTags.PRESSURE_PLATES)
+//					.addOptionalTag(BlockTags.CAULDRONS)
+//					.addOptionalTag(BlockTags.FENCE_GATES)
+//					.addOptionalTag(BlockTags.FENCES)
+//					.addOptionalTag(BlockTags.WALLS)
+//					.addOptionalTag(BlockTags.ALL_SIGNS)
+//					.addOptionalTag(BlockTags.CAMPFIRES)
+//					.addOptionalTag(BlockTags.CROPS)
+//					.addOptionalTag(BlockTags.BANNERS)
+//					.addOptionalTag(BlockTags.WART_BLOCKS)
+//					.addOptionalTag(BlockTags.CANDLE_CAKES)
+//					.addOptionalTag(BlockTags.PLANKS)
+//					.addOptionalTag(BlockTags.WOODEN_STAIRS)
+//					.addOptionalTag(BlockTags.WOODEN_SLABS)
+//					.addOptionalTag(BlockTags.FLOWER_POTS)
+//
+//					.add(
+//							Blocks.SHROOMLIGHT,
+//							Blocks.FROSTED_ICE,
+//							Blocks.ICE,
+//							Blocks.CHEST,
+//							Blocks.BARREL,
+//							Blocks.SAND,
+//							Blocks.RED_SAND,
+//							Blocks.BROWN_MUSHROOM,
+//							Blocks.RED_MUSHROOM,
+//							Blocks.TNT,
+//							Blocks.CACTUS,
+//							Blocks.CLAY,
+//							Blocks.PUMPKIN,
+//							Blocks.CARVED_PUMPKIN,
+//							Blocks.MELON,
+//							Blocks.CRIMSON_FUNGUS,
+//							Blocks.CRIMSON_NYLIUM,
+//							Blocks.CRIMSON_ROOTS,
+//							Blocks.WARPED_FUNGUS,
+//							Blocks.WARPED_NYLIUM,
+//							Blocks.WARPED_ROOTS,
+//							Blocks.NETHERRACK,
+//							Blocks.SCULK,
+//							Blocks.SPONGE,
+//							Blocks.WET_SPONGE,
+//							Blocks.SNIFFER_EGG,
+//							Blocks.TURTLE_EGG,
+//							Blocks.SLIME_BLOCK,
+//							Blocks.HONEY_BLOCK,
+//							Blocks.HONEYCOMB_BLOCK,
+//							Blocks.SEA_PICKLE,
+//							Blocks.SEA_LANTERN,
+//							Blocks.GLOWSTONE,
+//							Blocks.OCHRE_FROGLIGHT,
+//							Blocks.PEARLESCENT_FROGLIGHT,
+//							Blocks.VERDANT_FROGLIGHT,
+//							Blocks.TWISTING_VINES,
+//							Blocks.WEEPING_VINES,
+//							Blocks.TWISTING_VINES_PLANT,
+//							Blocks.WEEPING_VINES_PLANT,
+//							Blocks.VINE,
+//							Blocks.LADDER,
+//							Blocks.AMETHYST_CLUSTER,
+//							Blocks.LARGE_AMETHYST_BUD,
+//							Blocks.MEDIUM_AMETHYST_BUD,
+//							Blocks.SMALL_AMETHYST_BUD,
+//							Blocks.AMETHYST_BLOCK,
+//							Blocks.BAMBOO,
+//							Blocks.BAMBOO_SAPLING,
+//							Blocks.IRON_BARS,
+//							Blocks.COBWEB,
+//							Blocks.POINTED_DRIPSTONE,
+//							Blocks.BEE_NEST,
+//							Blocks.BEEHIVE,
+//							Blocks.SNOW,
+//							Blocks.SNOW_BLOCK,
+//							Blocks.POWDER_SNOW,
+//							Blocks.MANGROVE_ROOTS,
+//							Blocks.LILY_PAD,
+//							Blocks.DRIED_KELP_BLOCK,
+//							Blocks.CAKE,
+//							Blocks.FURNACE,
+//							Blocks.DROPPER,
+//							Blocks.DISPENSER,
+//							Blocks.COMPOSTER,
+//							Blocks.SMOKER,
+//							Blocks.BLAST_FURNACE,
+//							Blocks.JUKEBOX,
+//							Blocks.BREWING_STAND,
+//							Blocks.DECORATED_POT,
+//							Blocks.CHISELED_BOOKSHELF,
+//							Blocks.BOOKSHELF,
+//							Blocks.LECTERN,
+//							Blocks.TRAPPED_CHEST,
+//							Blocks.PISTON,
+//							Blocks.PISTON_HEAD,
+//							Blocks.STICKY_PISTON,
+//							Blocks.INFESTED_COBBLESTONE,
+//							Blocks.INFESTED_CHISELED_STONE_BRICKS,
+//							Blocks.INFESTED_DEEPSLATE,
+//							Blocks.INFESTED_STONE,
+//							Blocks.INFESTED_CRACKED_STONE_BRICKS,
+//							Blocks.INFESTED_STONE_BRICKS,
+//							Blocks.INFESTED_MOSSY_STONE_BRICKS,
+//							Blocks.SUSPICIOUS_GRAVEL,
+//							Blocks.SUSPICIOUS_SAND,
+//							Blocks.DIRT_PATH,
+//							Blocks.FARMLAND,
+//							Blocks.SHORT_GRASS,
+//							Blocks.TALL_GRASS,
+//							Blocks.SEAGRASS,
+//							Blocks.TALL_SEAGRASS,
+//							Blocks.KELP,
+//							Blocks.SUGAR_CANE,
+//							Blocks.TORCH,
+//							Blocks.LOOM,
+//							Blocks.STONECUTTER,
+//							Blocks.CARTOGRAPHY_TABLE,
+//							Blocks.SMITHING_TABLE,
+//							Blocks.GRINDSTONE,
+//							Blocks.FLETCHING_TABLE,
+//							Blocks.CAULDRON,
+//							Blocks.BREWING_STAND,
+//							Blocks.HOPPER,
+//							Blocks.LIGHTNING_ROD
+//					);
+
+			valueLookupBuilder(INDESTRUCTIBLE)
+					.add(Blocks.BEDROCK, Blocks.BARRIER, Blocks.BEACON, Blocks.STRUCTURE_BLOCK, Blocks.STRUCTURE_VOID,
+							Blocks.TEST_BLOCK, Blocks.TEST_INSTANCE_BLOCK, Blocks.COMMAND_BLOCK, Blocks.CHAIN_COMMAND_BLOCK,
+							Blocks.REPEATING_COMMAND_BLOCK, Blocks.LIGHT, Blocks.JIGSAW, Blocks.REINFORCED_DEEPSLATE);
 		}
 	}
 

@@ -17,7 +17,9 @@
 			"incantatium:pedestal_storage",
 			"incantatium:pedestal_text",
 			"incantatium:pedestal_interaction",
-			"incantatium:bank"
+			"incantatium:bank",
+			"actually-challenging-raids:stronger_evokers",
+			"actually-challenging-raids:ravager_attacks"
 		]
 	},
 	"contact": {

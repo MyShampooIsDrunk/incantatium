@@ -4,8 +4,6 @@ import myshampooisdrunk.drunk_server_toolkit.item.AbstractCustomItem;
 import myshampooisdrunk.drunk_server_toolkit.item.CustomItemHelper;
 import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.items.ornaments.SalvationOrnamentItem;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;

@@ -8,7 +8,6 @@ import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.component.BankAccount;
 import myshampooisdrunk.incantatium.items.CoinItem;
 import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;

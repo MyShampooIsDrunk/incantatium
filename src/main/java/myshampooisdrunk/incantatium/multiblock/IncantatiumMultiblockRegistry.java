@@ -2,8 +2,6 @@ package myshampooisdrunk.incantatium.multiblock;
 
 import myshampooisdrunk.drunk_server_toolkit.multiblock.entity.MultiblockDisplayEntity;
 import myshampooisdrunk.drunk_server_toolkit.multiblock.entity.MultiblockEntityType;
-import myshampooisdrunk.drunk_server_toolkit.multiblock.registry.MultiblockRegistry;
-import myshampooisdrunk.drunk_server_toolkit.multiblock.structure.MultiblockStructure;
 import myshampooisdrunk.drunk_server_toolkit.multiblock.structure.MultiblockStructureType;
 import myshampooisdrunk.drunk_server_toolkit.util.BlockUtil;
 import myshampooisdrunk.incantatium.Incantatium;
@@ -37,15 +35,8 @@ public class IncantatiumMultiblockRegistry {
     public static final MultiblockEntityType<DisplayEntity.ItemDisplayEntity, MultiblockDisplayEntity> ITEM_DISPLAY = MultiblockEntityType
             .register("item_display", MultiblockEntityType.Builder.create(MultiblockDisplayEntity::new, EntityType.ITEM_DISPLAY));
 
-//    public static final MultiblockStructureType<TestMultiblock> TEST = MultiblockStructureType.create("test", TestMultiblock::new,
-//            MultiblockStructure.Template.builder().add(0,-1,0,'p', BlockUtil.simpleLookup(Blocks.BAMBOO_BLOCK)).build(),
-//            BlockUtil.simpleLookup(Blocks.NETHERITE_BLOCK));
-
     public static final MultiblockStructureType<ShrineMultiblock> SHRINE = MultiblockStructureType.create(
             "shrine", ShrineMultiblock::new, ShrineMultiblock.getTemplate(), BlockUtil.simpleLookup(Blocks.ENCHANTING_TABLE));
-
-//    public static final MultiblockStructure TEST = MultiblockRegistry.register(new TestMultiblock(Incantatium.id("test")));
-//    public static final MultiblockStructure SHRINE = MultiblockRegistry.register(new ShrineMultiblock(Incantatium.id("shrine")));
 
     public static void init(){
         if(Incantatium.DEV_MODE) {
@@ -73,21 +64,6 @@ public class IncantatiumMultiblockRegistry {
 
     }
 
-
-//    public static Pedestal[] registerEntities(){
-//        Pedestal[] ret = new Pedestal[8];
-//        for (int i = 0; i < 8; i++) {
-//            PedestalEntityGenerator.PedestalEntity p = new PedestalEntityGenerator.PedestalEntity("pedestal_slot_"+i, i);
-//            PedestalEntityGenerator.PedestalEntityText t = new PedestalEntityGenerator.PedestalEntityText("pedestal_text_slot_"+i, i);
-//            PedestalEntityGenerator.PedestalEntityInteraction ei = new PedestalEntityGenerator.PedestalEntityInteraction("pedestal_interaction_slot_"+i, i);
-//            Pedestal x = new Pedestal(p,t,ei);
-//            ret[i] = x;
-//        }
-//        return ret;
-//    }
-
-
-
     private static void registerOrnamentRecipe(AbstractOrnamentItem item) {
         registerMultiblockRecipe(item.recipe(), item.getIdentifier());
     }
@@ -95,7 +71,4 @@ public class IncantatiumMultiblockRegistry {
     public static void registerMultiblockRecipe(AbstractMultiblockRecipe recipe, Identifier id) {
         IncantatiumRegistry.MULTIBLOCK_RECIPES.put(id, recipe);
     }
-
-//    public record Pedestal(PedestalEntityGenerator.PedestalEntity storage, PedestalEntityGenerator.PedestalEntityText text, PedestalEntityGenerator.PedestalEntityInteraction interaction) {
-//    }
 }

@@ -1,11 +1,9 @@
 package myshampooisdrunk.incantatium.mixin;
 
-import myshampooisdrunk.incantatium.Incantatium;
 import myshampooisdrunk.incantatium.items.abilities.Abilities;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -20,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ItemMixin {
     @Inject(method = "inventoryTick", at = @At("HEAD"))
     private void injectTridentInventoryTick(ItemStack stack, ServerWorld world, Entity entity, EquipmentSlot slot, CallbackInfo ci) {
-        if(entity instanceof ServerPlayerEntity player && stack.isOf(Items.TRIDENT) && player.isSneaking() &&
+        if(slot == EquipmentSlot.MAINHAND && entity instanceof ServerPlayerEntity player && stack.isOf(Items.TRIDENT) && player.isSneaking() &&
                 EnchantmentHelper.getTridentSpinAttackStrength(stack, player) > 0) {
             Abilities.updateAbility(player, Abilities.Type.RIPTIDE);
         }

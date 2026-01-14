@@ -39,7 +39,7 @@ import static net.minecraft.entity.effect.StatusEffects.MINING_FATIGUE;
 
 public class SalvationOrnamentItem extends AbstractOrnamentItem {
 
-    private static final DeathProtectionComponent DEATH_PROTECTION = new DeathProtectionComponent(List.of(
+    public static final DeathProtectionComponent DEATH_PROTECTION = new DeathProtectionComponent(List.of(
             new RemoveEffectsConsumeEffect(RegistryEntryList.of(List.of(BLINDNESS, WEAKNESS, HUNGER,
                     POISON, WITHER, GLOWING, LEVITATION, UNLUCK, DARKNESS, WIND_CHARGED, WEAVING, OOZING, INFESTED, SLOWNESS,
                     NAUSEA, MINING_FATIGUE, SLOW_FALLING))),
@@ -52,7 +52,7 @@ public class SalvationOrnamentItem extends AbstractOrnamentItem {
 
     public SalvationOrnamentItem() {
 //        super(Incantatium.id("salvation_ornament"), "Salvation", 9000);
-        super(Incantatium.id("salvation_ornament"), "Salvation", 9000, false);
+        super(Incantatium.id("salvation_ornament"), "Salvation", 12000, false);
         addComponent(DataComponentTypes.USE_COOLDOWN, new UseCooldownComponent(0.0001f, Optional.of(Incantatium.id("ornament_cooldown"))));
     }
 
@@ -140,7 +140,7 @@ public class SalvationOrnamentItem extends AbstractOrnamentItem {
             int charges = getCharges(player, stack);
             boolean charged = charges > 0;
             if (abilities.isActive(identifier) && stack.getDamage() < stack.getMaxDamage()) {
-                if(slot != null && slot.equals(EquipmentSlot.OFFHAND) && player.isSneaking()) {
+                if(slot != null && slot.equals(EquipmentSlot.OFFHAND) && player.isSneaking() && !(player.getMainHandStack() != null && player.getMainHandStack().isOf(Items.TOTEM_OF_UNDYING))) {
                     Abilities.updateAbility(player, Abilities.Type.SALVATION);
                 }
 

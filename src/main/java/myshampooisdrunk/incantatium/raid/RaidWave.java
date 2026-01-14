@@ -1,9 +1,13 @@
 package myshampooisdrunk.incantatium.raid;
 
+import it.unimi.dsi.fastutil.doubles.Double2ObjectRBTreeMap;
+import it.unimi.dsi.fastutil.ints.IntHeapPriorityQueue;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import myshampooisdrunk.incantatium.raid.upgrades.Upgrades;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
@@ -14,62 +18,114 @@ import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.world.Heightmap;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static myshampooisdrunk.incantatium.raid.ModifiedRaid.RAVAGER_SPAWN_LOCATION;
 
 public class RaidWave {
-    private final Set<RaiderEntry> raiders;
-    private final Object2IntLinkedOpenHashMap<Upgrades.RaiderUpgrade> totalUpgrades;
+    private static final int MAX_SQUAD_SIZE = 25;
+//    private final Set<RaiderEntry> raiders;
+    private final Object2IntMap<Upgrades.RaiderUpgrade> totalUpgrades;
     private final int wave;
+    private final int count;
+    private final Set<BlockPos> spawningLocations;
 
-    public RaidWave(int wave){
-        this.wave=wave;
-        raiders = new HashSet<>();
-        totalUpgrades = new Object2IntLinkedOpenHashMap<>();
+    public RaidWave(int wave, int count){
+        this.wave = wave;
+        this.count = count;
+//        this.raiders = new HashSet<>();
+        this.totalUpgrades = new Object2IntLinkedOpenHashMap<>();
+        this.spawningLocations = new HashSet<>();
     }
 
-    public void addRaider(RaiderEntry raider){
-        raiders.add(raider);
+//    public void addRaider(RaiderEntry raider) {
+//        raiders.add(raider);
+//    }
+
+//    public void spawnNextGroup(ServerWorld world) {
+//        raiders.forEach(raider -> raider.getRaider().heal(1000));//just in case they have health boost so they spawn w full health
+//        raiders.forEach(raider -> raider.getRaider().addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 50, 5)));//so they dont entity cram lol
+//        raiders.forEach(raider -> raider.spawn(world, pos));
+//    }
+
+    public List<BlockPos> generateRaiderSpawns() {
+        int squads = (int) Math.ceil((double) this.count / MAX_SQUAD_SIZE);
     }
 
-    public void spawnWave(World world, BlockPos pos){
-        raiders.forEach(raider -> raider.getRaider().heal(1000));//just in case they have health boost so they spawn w full health
-        raiders.forEach(raider -> raider.getRaider().addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 50, 5)));//so they dont entity cram lol
-        raiders.forEach(raider -> raider.spawn(world,pos));
+    private BlockPos findRandomRaidersSpawnLocation(ServerWorld world, int proximity, int preRaidTicks, BlockPos center) {
+        int i = preRaidTicks / 20;
+        float f = 0.22F * i - 0.24F;
+        BlockPos.Mutable mutable = new BlockPos.Mutable();
+        float g = world.random.nextFloat() * (float) (Math.PI * 2);
+
+        for (int j = 0; j < proximity; j++) {
+            float h = g + (float) Math.PI * j / 8.0F;
+            int k = center.getX() + MathHelper.floor(MathHelper.cos(h) * 32.0F * f) + world.random.nextInt(3) * MathHelper.floor(f);
+            int l = center.getZ() + MathHelper.floor(MathHelper.sin(h) * 32.0F * f) + world.random.nextInt(3) * MathHelper.floor(f);
+            int m = world.getTopY(Heightmap.Type.WORLD_SURFACE, k, l);
+            if (MathHelper.abs(m - center.getY()) <= 96) {
+                mutable.set(k, m, l);
+                if (!world.isNearOccupiedPointOfInterest(mutable) || i <= 7) {
+                    int n = 10;
+                    if (world.isRegionLoaded(mutable.getX() - 10, mutable.getZ() - 10, mutable.getX() + 10, mutable.getZ() + 10)
+                            && world.shouldTickEntityAt(mutable)
+                            && (
+                            RAVAGER_SPAWN_LOCATION.isSpawnPositionOk(world, mutable, EntityType.RAVAGER)
+                                    || world.getBlockState(mutable.down()).isOf(Blocks.SNOW) && world.getBlockState(mutable).isAir()
+                    )) {
+                        return mutable;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
-    public int getWave(){return wave;}
-    public Set<RaiderEntry> getRaiders() {return raiders;}
-    public void setRaid(Raid raid, BlockPos pos){
-        raiders.forEach(raider -> {
-            raider.joinRaid(raid, wave, pos, false);
-        });
+
+    public int getWave() {
+        return wave;
     }
-    public void addUpgrade(Upgrades.RaiderUpgrade u){
-        totalUpgrades.put(u,totalUpgrades.containsKey(u) ? totalUpgrades.getInt(u) + 1 : 1);
+
+//    public Set<RaiderEntry> getRaiders() {
+//        return raiders;
+//    }
+
+    public void addUpgrades(Upgrades.RaiderUpgrade u, int count){
+        totalUpgrades.put(u, totalUpgrades.getOrDefault(u, 0) + count);
     }
-    public Object2IntLinkedOpenHashMap<Upgrades.RaiderUpgrade> getUpgrades(){return totalUpgrades;}
+
+    public void tickSpawning(ServerWorld world, BlockPos center) {
+
+    }
+
+    public Object2IntMap<Upgrades.RaiderUpgrade> getUpgrades() {
+        return totalUpgrades;
+    }
 
     public static class RaiderEntry {
-        private final List<String> upgrades;
+        private final Object2IntMap<String> upgrades;
         private RaiderEntity baseRaider;
         private MobEntity pet = null;
         private MobEntity mount = null;
         private final int difficulty; //omen + world difficulty
-        private final Object2IntLinkedOpenHashMap<Upgrades.RaiderUpgrade> waveUpgrades;
-        private final Set<StatusEffectInstance> effects;
+        private final Object2IntMap<String> waveUpgrades;
         private int waveRaiderCount;
 
         public RaiderEntry(RaiderEntity baseRaider, int difficulty){
             this.difficulty = difficulty;
             this.baseRaider = baseRaider;
-            this.upgrades = new ArrayList<>();
+            this.upgrades = new Object2IntLinkedOpenHashMap<>();
             this.waveUpgrades = new Object2IntLinkedOpenHashMap<>();
             this.waveRaiderCount = 0;
-            this.effects = new HashSet<>();
+        }
+
+        public int getUpgradeCount(String upgrade) {
+            return upgrades.getOrDefault(upgrade, 0);
         }
 
         public void setPet(MobEntity pet) {
@@ -83,7 +139,8 @@ public class RaidWave {
         public void setWaveRaiderCount(int count) {
             this.waveRaiderCount = count;
         }
-        public int getWaveRaiderCount(){
+
+        public int getWaveRaiderCount() {
             return waveRaiderCount;
         }
 
@@ -92,14 +149,14 @@ public class RaidWave {
             baseRaider.setPersistent();
             baseRaider.setVelocity(randomVel(0.2,0.01,0.2, baseRaider.getRandom()));
 
-            for (StatusEffectInstance instance : effects) {
-                baseRaider.addStatusEffect(instance);
-                if(pet != null)
-                    pet.addStatusEffect(instance);
-
-                if(mount != null)
-                    mount.addStatusEffect(instance);
-            }
+//            for (StatusEffectInstance instance : effects) {
+//                baseRaider.addStatusEffect(instance);
+//                if(pet != null)
+//                    pet.addStatusEffect(instance);
+//
+//                if(mount != null)
+//                    mount.addStatusEffect(instance);
+//            }
 
             if(pet != null) {
                 pet.refreshPositionAndAngles(pos.toCenterPos(), 0, 0);
@@ -120,8 +177,17 @@ public class RaidWave {
         public RaiderEntity getRaider(){
             return baseRaider;
         }
+
+//        public void addEffect(StatusEffectInstance effect) {
+//            this.effects.add(effect);
+//        }
+
         public void setRaider(RaiderEntity raider){
             baseRaider = raider;
+        }
+
+        public MobEntity getPet() {
+            return pet;
         }
 
         public void setUpgrades() {
@@ -131,7 +197,7 @@ public class RaidWave {
                 upgrade.apply(this);
             }
 
-            if(!upgrades.contains(Upgrades.WEAPON.id())){
+            if(!upgrades.containsKey(Upgrades.WEAPON.id())){
                 switch(baseRaider){
                     case VindicatorEntity vind -> vind.setStackInHand(Hand.MAIN_HAND, Items.IRON_AXE.getDefaultStack());
                     case PillagerEntity pilly -> pilly.setStackInHand(Hand.MAIN_HAND, Items.CROSSBOW.getDefaultStack());
@@ -141,66 +207,73 @@ public class RaidWave {
         }
 
         public List<Upgrades.RaiderUpgrade> getUpgrades(){
-            return upgrades.stream().map(Upgrades.RaiderUpgrade::getUpgrade)
-                    .sorted(Comparator.comparingInt(Upgrades.RaiderUpgrade::sortWeight)).toList();
+            return upgrades.keySet().stream().map(Upgrades.RaiderUpgrade::getUpgrade)
+                    .sorted(Comparator.comparingInt(Upgrades.RaiderUpgrade::sortWeight).reversed()).toList();
         }
 
         public int getDifficulty() {
             return difficulty;
         }
+
         public int addUpgrades(int points) {
-            Random rand = baseRaider.getRandom();
-            List<Upgrades.RaiderUpgrade> poss = new ArrayList<>();
-//            Map<Upgrades.RaiderUpgrade, Integer> weights = new HashMap<>();
-            int totalWeight = 0;
+            Double2ObjectRBTreeMap<Upgrades.RaiderUpgrade> weightMap = new Double2ObjectRBTreeMap<>();
+//            NavigableMap<Double, Upgrades.RaiderUpgrade> weightMap = new TreeMap<>();
+            double totalWeight = 0;
+            int minCost = Integer.MAX_VALUE;
+
             for (Upgrades.RaiderUpgrade upgrade : Upgrades.RaiderUpgrade.UPGRADES.values()) {
-                int cost = upgrade.getCost(this);
-                if(cost != -1 && cost <= points) {
-                    totalWeight += cost;
-                    poss.add(upgrade);
-//                    weights.put(upgrade, totalWeight);
+                int cost = upgrade.getCost(this.getUpgradeCount(upgrade.id()), this);
+
+                if (cost != -1) {
+                    double weight = 1.0 / (cost + 1.0);
+
+                    totalWeight += weight;
+                    weightMap.put(totalWeight, upgrade);
+
+                    if (cost < minCost) minCost = cost;
                 }
             }
 
-//            int finalTotalWeight = totalWeight;
-//            weights.replaceAll((u, i) -> finalTotalWeight - i);
-            poss = poss.reversed();
+            Random rand = baseRaider.getRandom();
+            int currentPoints = points;
+            int failedAttempts = 0;
+            int maxFailures = 10;
 
-            int cost, newCost, totalCost = 0, index = 0;
-            Upgrades.RaiderUpgrade upgrade;
+            while (currentPoints >= minCost && failedAttempts < maxFailures) {
 
-            while(!poss.isEmpty()) {
-                if(rand.nextBetween(0, cost = (upgrade = poss.get(index)).getCost(this)) > totalWeight) {
-                    this.upgrades.add(upgrade.id());
-                    newCost = upgrade.getCost(this);
-                    totalCost += cost;
-                    if(newCost >= 0) {
-                        totalWeight += (newCost - cost); //newCost should be >= cost, 0, or -1 (-1 means cant apply anymore)
-                        index++;
-                    } else {
-                        index = 0;
-                        totalCost -= cost;
-                    }
+                double target = rand.nextDouble() * totalWeight;
+
+
+                Map.Entry<Double, Upgrades.RaiderUpgrade> entry = weightMap.tailMap(target).firstEntry();
+
+                if (entry == null) {
+                    continue;
                 }
-            } //essentially using BFS to create a maze
 
-            return totalCost;
+                Upgrades.RaiderUpgrade candidate = entry.getValue();
+                int currentLevel = this.getUpgradeCount(candidate.id());
+                int cost = candidate.getCost(currentLevel, this);
 
-//            if(poss.isEmpty()) return 0;
-//            Collections.shuffle(poss);
-//            RaiderUpgrade chosen = poss.size() == 1 ? poss.getFirst().getUpgrade() : poss.get(rand.nextInt(poss.size()-1)).getUpgrade();
-//            upgrades.add(chosen);
-//            if(chosen.applyCost(this,points)) points.set(points.get() - chosen.getCost().apply(this));
-//            if(points.get() > 0 && !poss.isEmpty()) addUpgrades(points);
+                if (cost != -1 && cost <= currentPoints) {
+                    this.upgrades.put(candidate.id(), currentLevel + 1);
+                    currentPoints -= cost;
+
+                    failedAttempts = 0;
+                } else {
+                    failedAttempts++;
+                }
+            }
+
+            return points - currentPoints;
         }
 
-        public Object2IntLinkedOpenHashMap<Upgrades.RaiderUpgrade> getWaveUpgrades() {
-            return waveUpgrades;
+        public int getWaveUpgradeCount(String id) {
+            return waveUpgrades.getOrDefault(id, 0);
         }
 
         public void setWaveUpgrades(Map<Upgrades.RaiderUpgrade, Integer> upgrades){
             waveUpgrades.clear();
-            waveUpgrades.putAll(upgrades);
+            upgrades.forEach((u, i) -> waveUpgrades.put(u.id(), i.intValue()));
         }
 
         public static Vec3d randomVel(double xMax, double yMax, double zMax, Random rand){

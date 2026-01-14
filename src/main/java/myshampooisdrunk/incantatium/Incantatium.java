@@ -71,6 +71,10 @@ public class Incantatium implements ModInitializer {
 			id("pedestal_interaction"), PedestalInteraction.class);
 	public static final ComponentKey<PlayerBankAccount> PLAYER_BANK_ACCOUNT_COMPONENT_KEY = ComponentRegistry.getOrCreate(
 			id("bank"), PlayerBankAccount.class);
+	public static final ComponentKey<EvokerStrongerEvokers> STRONGER_EVOKERS_COMPONENT_KEY = ComponentRegistry.getOrCreate(
+			id("stronger_evokers"), EvokerStrongerEvokers.class);
+	public static final ComponentKey<RavagerCustomAttacks> RAVAGER_ATTACKS_COMPONENT_KEY = ComponentRegistry.getOrCreate(
+			id("ravager_attacks"), RavagerCustomAttacks.class);
 
 	@Override
 	public void onInitialize() {

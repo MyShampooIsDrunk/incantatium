@@ -1,12 +1,9 @@
 package myshampooisdrunk.incantatium.items;
 
-import myshampooisdrunk.drunk_server_toolkit.item.AbstractCustomItem;
 import myshampooisdrunk.drunk_server_toolkit.item.AbstractRecipeItem;
-import myshampooisdrunk.drunk_server_toolkit.item.CustomRecipe;
 import myshampooisdrunk.incantatium.Incantatium;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ConsumableComponent;
-import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -19,7 +16,6 @@ import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 import java.util.List;
 import java.util.Map;

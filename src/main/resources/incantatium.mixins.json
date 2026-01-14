@@ -18,8 +18,6 @@
     "MaceItemMixin",
     "PlayerInventoryMixin",
     "ScoreboardMixin",
-    "ServerPlayerEntityMixin",
-    "ServerPlayerInteractionManagerMixin",
     "StatusEffectsMixin",
     "TridentItemMixin",
     "TripwireHookBlockMixin",

@@ -1,7 +1,6 @@
 package myshampooisdrunk.incantatium.multiblock.recipe;
 
 import myshampooisdrunk.incantatium.multiblock.inventory.MultiblockInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.recipe.RecipeInputProvider;
 import net.minecraft.recipe.input.RecipeInput;
 
